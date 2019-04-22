@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DataDiet</string>
+    <string name="scanButton">scanButton</string>
+</resources>
