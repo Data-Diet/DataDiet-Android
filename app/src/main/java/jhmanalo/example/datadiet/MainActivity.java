@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
 
     CameraView cameraView;
     Button btnDetect;
+    Button btnSettings;
+    Button btnHistory;
     AlertDialog waitingDialog;
 
     @Override
@@ -71,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         cameraView = findViewById(R.id.cameraview);
-        btnDetect = findViewById(R.id.btn_detect);
+        btnDetect = findViewById(R.id.btndetect);
+        btnSettings = findViewById(R.id.btnsettings);
+        btnHistory = findViewById(R.id.btnhistory);
+
         waitingDialog = new SpotsDialog.Builder()
                 .setContext(this)
                 .setMessage("Please wait")
