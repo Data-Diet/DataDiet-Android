@@ -36,12 +36,12 @@
         android:gravity="center|bottom">
 
         <Button
-            android:id="@+id/pictures"
+            android:id="@+id/btnimagegallery"
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:layout_marginRight="100dp"
 
-            android:background="@drawable/pictures" />
+            android:background="@drawable/imagegallery" />
 
         <Button
             android:id="@+id/btndetect"

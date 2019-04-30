@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 
+import java.io.File;
 import java.util.List;
 
 import dmax.dialog.SpotsDialog;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     CameraView cameraView;
     Button btnDetect;
     Button btnSettings;
+    Button btnImageGallery;
     Button btnHistory;
     AlertDialog waitingDialog;
 
@@ -74,8 +77,12 @@ public class MainActivity extends AppCompatActivity {
 
         cameraView = findViewById(R.id.cameraview);
         btnDetect = findViewById(R.id.btndetect);
+        btnImageGallery = findViewById(R.id.btnimagegallery);
         btnSettings = findViewById(R.id.btnsettings);
         btnHistory = findViewById(R.id.btnhistory);
+
+        btnImageGallery.setOnClickListener(ImageGalleryCLicked);
+
 
         waitingDialog = new SpotsDialog.Builder()
                 .setContext(this)
@@ -119,6 +126,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    private View.OnClickListener ImageGalleryCLicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+
+            File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            String pictureDirectoryPath = pictureDirectory.getPath();
+
+            Uri data = Uri.parse(pictureDirectoryPath);
+
+            photoPickerIntent.setDataAndType(data, "image/*");
+
+            startActivityForResult(photoPickerIntent, IMAGE_GALLERY_REQUEST);
+        }
+    };
 
     private void runDetector(Bitmap bitmap) {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
