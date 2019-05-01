@@ -30,7 +30,7 @@ public class Settings extends AppCompatActivity {
         pescatarian.setChecked(sp.getBoolean("pescatarianChecked", false));
         allergies.setChecked(sp.getBoolean("allergiesChecked", false));
         if (allergies.isChecked())
-            allergylist.setText(sp.getString("allergylist", "@string/hint"));
+            allergylist.setText(sp.getString("allergylist", ""));
         else
             allergylist.setVisibility(View.INVISIBLE);
         allergies.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -38,7 +38,7 @@ public class Settings extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     allergylist.setVisibility(View.VISIBLE);
-                    allergylist.setText(sp.getString("allergylist", "@string/hint"));
+                    allergylist.setText(sp.getString("allergylist", ""));
                 } else
                     allergylist.setVisibility(View.INVISIBLE);
             }
