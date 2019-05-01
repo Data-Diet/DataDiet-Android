@@ -37,9 +37,9 @@
 
         <Button
             android:id="@+id/btnimagegallery"
-            android:layout_width="50dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="100dp"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:layout_marginRight="110dp"
 
             android:background="@drawable/imagegallery" />
 
@@ -52,9 +52,9 @@
 
         <Button
             android:id="@+id/btnhistory"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="100dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="110dp"
             android:background="@drawable/history" />
     </android.support.v7.widget.LinearLayoutCompat>
 
