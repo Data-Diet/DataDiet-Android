@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
     Button btnHistory;
     AlertDialog waitingDialog;
 
-    static int IMAGE_GALLERY_REQUEST = 1;
-
     @Override
     protected void onResume() {
         super.onResume();

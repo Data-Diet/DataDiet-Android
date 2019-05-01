@@ -21,13 +21,14 @@
 
         <Button
             android:id="@+id/btnsettings"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="350dp"
-            android:layout_marginTop="12dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignBottom="@+id/btndetect"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="350dp"
+            android:alpha=".5"
             android:background="@drawable/settings"
-            android:onClick="openSettings"/>
+            android:onClick="openSettings" />
 
     </android.support.v7.widget.LinearLayoutCompat>
 
@@ -42,6 +43,7 @@
             android:layout_height="20dp"
             android:layout_marginRight="110dp"
 
+            android:alpha=".5"
             android:background="@drawable/imagegallery" />
 
         <Button
@@ -49,6 +51,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_marginBottom="10dp"
+            android:alpha=".5"
             android:background="@drawable/scanbutton" />
 
         <Button
@@ -56,6 +59,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginLeft="110dp"
+            android:alpha=".5"
             android:background="@drawable/history" />
     </android.support.v7.widget.LinearLayoutCompat>
 
