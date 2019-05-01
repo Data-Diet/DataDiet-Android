@@ -9,11 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".History"></activity>
         <activity android:name=".Settings"/>
-        <activity android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            >
-
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="com.google.firebase.ml.vision.DEPENDENCIES"
                 android:value="barcode" />

@@ -60,7 +60,9 @@
             android:layout_height="30dp"
             android:layout_marginLeft="110dp"
             android:alpha=".7"
-            android:background="@drawable/ic_library_books_black_24dp" />
+            android:background="@drawable/ic_library_books_black_24dp"
+            android:onClick="openHistory" />
+
     </android.support.v7.widget.LinearLayoutCompat>
 
 </RelativeLayout>

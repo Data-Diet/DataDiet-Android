@@ -214,4 +214,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Settings.class);
         startActivity(intent);
     }
+
+    public void openHistory(View view) {
+        Intent intent = new Intent(this, History.class);
+        startActivity(intent);
+    }
 }
+
