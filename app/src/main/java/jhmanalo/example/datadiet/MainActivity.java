@@ -83,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnsettings);
         btnHistory = findViewById(R.id.btnhistory);
 
-        btnImageGallery.setOnClickListener(ImageGalleryCLicked);
-
 
         waitingDialog = new SpotsDialog.Builder()
                 .setContext(this)
@@ -128,22 +126,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
-    private View.OnClickListener ImageGalleryCLicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-
-            File pictureDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            String pictureDirectoryPath = pictureDirectory.getPath();
-
-            Uri data = Uri.parse(pictureDirectoryPath);
-
-            photoPickerIntent.setDataAndType(data, "image/*");
-
-            startActivityForResult(photoPickerIntent, IMAGE_GALLERY_REQUEST);
-        }
-    };
 
     private void runDetector(Bitmap bitmap) {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
@@ -228,5 +210,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         waitingDialog.dismiss();
+    }
+
+    public void openSettings(View view) {
+        Intent intent = new Intent(this, Settings.class);
+        startActivity(intent);
     }
 }
