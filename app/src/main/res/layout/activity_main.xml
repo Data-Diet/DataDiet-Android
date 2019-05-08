@@ -44,7 +44,8 @@
             android:layout_marginRight="130dp"
             android:layout_marginBottom="-15dp"
             android:alpha=".7"
-            android:background="@drawable/ic_image_black_24dp" />
+            android:background="@drawable/ic_image_black_24dp"
+            android:onClick="openPhotos" />
 
         <Button
             android:id="@+id/btndetect"

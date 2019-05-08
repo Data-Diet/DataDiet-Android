@@ -33,6 +33,10 @@ import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
 
+import android.provider.MediaStore;
+import android.widget.ImageView;
+
+
 import java.io.File;
 import java.util.List;
 
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     Button btnImageGallery;
     Button btnHistory;
     AlertDialog waitingDialog;
+
+    public final static int PICK_PHOTO_CODE = 1046;
 
     @Override
     protected void onResume() {
@@ -218,6 +224,25 @@ public class MainActivity extends AppCompatActivity {
     public void openHistory(View view) {
         Intent intent = new Intent(this, History.class);
         startActivity(intent);
+    }
+
+    public void openPhotos(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (intent.resolveActivity(getPackageManager()) != null)
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data != null) {
+            Uri photoUri = data.getData();
+            try {
+                Bitmap image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
+                runDetector(image);
+            } catch (Exception e) {
+
+            }
+        }
     }
 }
 
