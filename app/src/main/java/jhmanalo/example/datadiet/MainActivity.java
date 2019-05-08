@@ -185,30 +185,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
 
-                case FirebaseVisionBarcode.TYPE_CONTACT_INFO:
-                {
-                    String info = new StringBuilder("Name: ")
-                            .append(item.getContactInfo().getName().getFormattedName())
-                            .append("\n")
-                            .append("Address: ")
-                            .append(item.getContactInfo().getAddresses().get(0).getAddressLines())
-                            .append("\n")
-                            .append("Email: ")
-                            .append(item.getContactInfo().getEmails().get(0).getAddress())
-                            .toString();
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-                    builder.setMessage(info);
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    android.support.v7.app.AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                break;
-
                 default:
                     break;
             }
