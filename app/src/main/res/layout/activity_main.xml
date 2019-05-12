@@ -19,51 +19,74 @@
         android:layout_height="match_parent"
         android:gravity="center|top">
 
-        <Button
-            android:id="@+id/btnsettings"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignBottom="@+id/btndetect"
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="365dp"
-            android:alpha=".7"
-            android:background="@drawable/ic_settings_black_24dp"
-            android:onClick="openSettings" />
 
     </android.support.v7.widget.LinearLayoutCompat>
 
-    <android.support.v7.widget.LinearLayoutCompat
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center|bottom">
 
         <Button
-            android:id="@+id/btnimagegallery"
+            android:id="@+id/btnsettings"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginRight="130dp"
-            android:layout_marginBottom="-15dp"
-            android:alpha=".7"
+            android:layout_alignBottom="@+id/btndetect"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:alpha=".8"
+            android:background="@drawable/ic_settings_black_24dp"
+            android:onClick="openSettings"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnimagegallery"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+            android:alpha=".8"
             android:background="@drawable/ic_image_black_24dp"
-            android:onClick="openPhotos" />
+            android:onClick="openPhotos"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnhistory"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_conversion_absoluteHeight="30dp"
+            tools:layout_conversion_absoluteWidth="30dp" />
 
         <Button
             android:id="@+id/btndetect"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:alpha=".5"
-            android:background="@drawable/ic_crop_free_white_24dp" />
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="8dp"
+            android:alpha=".8"
+            android:background="@drawable/ic_crop_free_white_24dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_conversion_absoluteHeight="70dp"
+            tools:layout_conversion_absoluteWidth="70dp" />
 
         <Button
             android:id="@+id/btnhistory"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="130dp"
-            android:layout_marginBottom="-15dp"
-            android:alpha=".7"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:alpha=".8"
             android:background="@drawable/ic_library_books_black_24dp"
-            android:onClick="openHistory" />
+            android:onClick="openHistory"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_conversion_absoluteHeight="30dp"
+            tools:layout_conversion_absoluteWidth="30dp" />
 
-    </android.support.v7.widget.LinearLayoutCompat>
+    </android.support.constraint.ConstraintLayout>
 
 </RelativeLayout>
