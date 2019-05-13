@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ScrollView;
 import android.widget.LinearLayout;
+import android.view.View;
 
 public class History extends AppCompatActivity {
 
@@ -16,5 +17,9 @@ public class History extends AppCompatActivity {
         setContentView(R.layout.history);
         sv = findViewById(R.id.scroll_view);
         ll = findViewById(R.id.linear_layout);
+    }
+
+    public void closeHistory(View view) {
+        finish();
     }
 }
