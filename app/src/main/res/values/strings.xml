@@ -8,4 +8,7 @@
     <string name="pescatarian">Pescatarian</string>
     <string name="allergies">Allergies</string>
     <string name="hint">List allergies separated by commas</string>
+
+    <string name="labelTitle">Product Labels</string>
+    <string name="ingredientsTitle">Ingredients</string>
 </resources>

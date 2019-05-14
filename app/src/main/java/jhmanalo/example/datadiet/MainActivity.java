@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -16,10 +18,15 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,6 +42,7 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.squareup.picasso.Picasso;
 import com.wonderkiln.camerakit.CameraKitError;
 import com.wonderkiln.camerakit.CameraKitEvent;
 import com.wonderkiln.camerakit.CameraKitEventListener;
@@ -46,6 +54,7 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -76,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog waitingDialog;
     ProgressDialog pd;
 
+    LinearLayout linearLayout;
+    ScrollView scrollView;
 
     public final static int PICK_PHOTO_CODE = 1046;
 
@@ -89,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         cameraView.stop();
+    }
+
+    public void closeProduct(View view) {
+        scrollView.setVisibility(View.INVISIBLE);
+        cameraView.start();
     }
 
     @Override
@@ -216,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
                 case FirebaseVisionBarcode.TYPE_PRODUCT:
                 {
-                    new JsonTask().execute("https://world.openfoodfacts.org/api/v7/product/" + item.getRawValue() + ".json");
+                    new JsonTask().execute("https://world.openfoodfacts.org/api/v1/product/" + item.getRawValue() + ".json");
                 }
                 break;
 
@@ -263,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
             pd = new ProgressDialog(MainActivity.this);
             pd.setMessage("Retrieving product data");
-            pd.setCancelable(false);
+            pd.setCancelable(true);
             pd.show();
         }
 
@@ -317,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if (pd.isShowing()){
+            if (pd.isShowing()) {
                 pd.dismiss();
             }
 
@@ -325,16 +341,71 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONObject obj = new JSONObject(result);
 
+                linearLayout = findViewById(R.id.itemLayout);
+                scrollView = findViewById(R.id.itemScrollLayout);
+                ImageView productPicture = findViewById(R.id.productPic);
+                TextView productTitleView = findViewById(R.id.productTitle);
+
+                String imageURL = obj.getJSONObject("product").get("image_front_url").toString();
+                Log.d("JSON URL", imageURL);
+                String productTitle = obj.getJSONObject("product").get("product_name").toString();
+                Log.d("JSON Array", String.valueOf(obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()));
+
+                productTitleView.setText(productTitle);
+
+                Picasso.get()
+                        .load(imageURL)
+                        .resize(1000,1000)
+                        .centerCrop()
+                        .into(productPicture);
+
+                TextView labelTitle = new TextView(context);
+                labelTitle.setPadding(0,10,0,0);
+                labelTitle.setText(R.string.labelTitle);
+                labelTitle.setTextSize(20);
+                labelTitle.setTextColor(getResources().getColor(R.color.black));
+                linearLayout.addView(labelTitle);
+
+                int i = 0;
+                while (i < obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()) {
+                    TextView label = new TextView(context);
+                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("labels_hierarchy");
+                    label.setText(labelArray.get(i).toString().substring(3));
+                    label.setTextColor(getResources().getColor(R.color.black));
+                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    linearLayout.addView(label);
+                    i++;
+                }
+
+                TextView ingredientsTitle = new TextView(context);
+                ingredientsTitle.setPadding(0,10,0,0);
+                ingredientsTitle.setText(R.string.ingredientsTitle);
+                ingredientsTitle.setTextSize(20);
+                ingredientsTitle.setTextColor(getResources().getColor(R.color.black));
+                linearLayout.addView(ingredientsTitle);
+
+                int j = 0;
+                while (j < obj.getJSONObject("product").getJSONArray("ingredients_tags").length()) {
+                    TextView label = new TextView(context);
+                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("ingredients_tags");
+                    label.setText(labelArray.get(j).toString().substring(3));
+                    label.setTextColor(getResources().getColor(R.color.black));
+                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    linearLayout.addView(label);
+                    j++;
+                }
+
+                scrollView.bringToFront();
+                linearLayout.bringToFront();
+                scrollView.setVisibility(View.VISIBLE);
+
                 Log.d("My App", obj.toString());
 
             } catch (Throwable t) {
                 Log.e("My App", "Could not parse malformed JSON: \"" + result + "\"");
+                Toast.makeText(context, "Sorry, product was not found", Toast.LENGTH_LONG).show();
+                cameraView.start();
             }
-
         }
     }
 }
-
-
-
-
