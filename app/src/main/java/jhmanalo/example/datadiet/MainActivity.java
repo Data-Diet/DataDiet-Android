@@ -2,16 +2,20 @@ package jhmanalo.example.datadiet;
 
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,6 +25,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode;
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetector;
@@ -37,7 +46,16 @@ import android.provider.MediaStore;
 import android.widget.ImageView;
 
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import dmax.dialog.SpotsDialog;
@@ -45,12 +63,19 @@ import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity {
 
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mGetReference;
+
+    Context context;
+
     CameraView cameraView;
     Button btnDetect;
     Button btnSettings;
     Button btnImageGallery;
     Button btnHistory;
     AlertDialog waitingDialog;
+    ProgressDialog pd;
+
 
     public final static int PICK_PHOTO_CODE = 1046;
 
@@ -69,6 +94,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
+        mDatabase = FirebaseDatabase.getInstance();
+        mGetReference = mDatabase.getReference();
+
+        context = this;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -84,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
         waitingDialog = new SpotsDialog.Builder()
                 .setContext(this)
-                .setMessage("Please wait")
+                .setMessage("Detecting Barcode")
                 .setCancelable(false)
                 .build();
 
@@ -129,8 +158,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
         FirebaseVisionBarcodeDetectorOptions options = new FirebaseVisionBarcodeDetectorOptions.Builder()
                 .setBarcodeFormats(
-                        FirebaseVisionBarcode.FORMAT_QR_CODE,
-                        FirebaseVisionBarcode.FORMAT_PDF417 //any
+                        FirebaseVisionBarcode.FORMAT_UPC_A//any
                 )
 
                 .build();
@@ -140,7 +168,14 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionBarcode>>() {
                     @Override
                     public void onSuccess(List<FirebaseVisionBarcode> firebaseVisionBarcodes) {
-                        processResult(firebaseVisionBarcodes);
+                        Log.d("detectInImage", String.valueOf(firebaseVisionBarcodes.size()));
+                        if (firebaseVisionBarcodes.size() > 0)
+                            processResult(firebaseVisionBarcodes);
+                        else {
+                            Toast.makeText(context, "Unable to detect valid barcode", Toast.LENGTH_LONG).show();
+                            cameraView.start();
+                            waitingDialog.dismiss();
+                        }
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -155,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         for (FirebaseVisionBarcode item : firebaseVisionBarcodes)
         {
             int value_type = item.getValueType();
+            Log.d("processResult", String.valueOf(value_type));
             switch (value_type)
             {
                 case FirebaseVisionBarcode.TYPE_TEXT:
@@ -174,8 +210,13 @@ public class MainActivity extends AppCompatActivity {
 
                 case FirebaseVisionBarcode.TYPE_URL:
                 {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getRawValue()));
-                    startActivity(intent);
+
+                }
+                break;
+
+                case FirebaseVisionBarcode.TYPE_PRODUCT:
+                {
+                    new JsonTask().execute("https://world.openfoodfacts.org/api/v7/product/" + item.getRawValue() + ".json");
                 }
                 break;
 
@@ -214,5 +255,86 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    private class JsonTask extends AsyncTask<String, String, String> {
+
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("Retrieving product data");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        protected String doInBackground(String... params) {
+
+
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL url = new URL(params[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+
+                InputStream stream = connection.getInputStream();
+
+                reader = new BufferedReader(new InputStreamReader(stream));
+
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line+"\n");
+                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
+
+                }
+
+                return buffer.toString();
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (pd.isShowing()){
+                pd.dismiss();
+            }
+
+            try {
+
+                JSONObject obj = new JSONObject(result);
+
+                Log.d("My App", obj.toString());
+
+            } catch (Throwable t) {
+                Log.e("My App", "Could not parse malformed JSON: \"" + result + "\"");
+            }
+
+        }
+    }
 }
+
+
+
 
