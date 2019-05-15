@@ -1,4 +1,4 @@
 # DataDiet
-To Store in SQLite Database: \n
-JSON URL <String> \n
-Allergens to preferences <blob> \n
+To Store in SQLite Database: |
+JSON URL <String> |
+Allergens to preferences <blob> |
