@@ -16,6 +16,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     static String DB_NAME = "INGREDIENT_DATABASE";
     static String TABLE_NAME = "INGREDIENT_TABLE";
     static int VERSION = 1;
+    public static String strSeparator = "_,_";
 
     public ProductDbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -27,7 +28,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //CREATE TABLE NAME_TABLE (_id INTEGER PRIMARY KEY, FIRST_NAME STRING, LAST_NAME STRING);
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, JSON JSONObject, INGREDIENTS STRING);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, PRODUCT_URL STRING, INGREDIENTS STRING);");
         Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
     }
 
@@ -42,13 +43,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         }
 
     }
-    public void insert(String name, JSONObject json, String ingredients){
+
+    public void insert(String name, String url, String ingredients){
         db = getWritableDatabase();
         ContentValues cv = new ContentValues();
-        String s = json.toString();
-        cv.put("NAME", name);
-        cv.put("JSON_OBJECT", s);
-        cv.put("INGREDIENT_LIST", ingredients);
+        cv.put("PRODUCT_NAME", name);
+        cv.put("PRODUCT_URL", url);
+        cv.put("INGREDIENTS", ingredients);
 
         db.insert(TABLE_NAME, null, cv);
     }
@@ -77,7 +78,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     public Cursor view(){
         db = getReadableDatabase();
         //Cursor c = db.query(TABLE_NAME, new String[]{"FIRST_NAME", "LAST_NAME"}, null, null, null, null, "LAST_NAME ASC");
-        Cursor c = db.rawQuery("SELECT _id, JSON_OBJECT, INGREDIENTS FROM " + TABLE_NAME+";", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME+";", null);
         return c;
     }
 
