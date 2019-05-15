@@ -1,4 +1,4 @@
-package com.example.assignment2;
+package jhmanalo.example.datadiet;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,15 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-public class ImageDatabase extends SQLiteOpenHelper {
+import org.json.JSONObject;
+
+public class ProductDbHelper extends SQLiteOpenHelper {
 
     SQLiteDatabase db;
     Context ctx;
-    static String DB_NAME = "IMAGE_DATABASE";
-    static String TABLE_NAME = "IMAGE_TABLE";
+    static String DB_NAME = "INGREDIENT_DATABASE";
+    static String TABLE_NAME = "INGREDIENT_TABLE";
     static int VERSION = 1;
 
-    public ImageDatabase(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public ProductDbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         ctx = context;
         VERSION = version;
@@ -25,7 +27,7 @@ public class ImageDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //CREATE TABLE NAME_TABLE (_id INTEGER PRIMARY KEY, FIRST_NAME STRING, LAST_NAME STRING);
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, IMAGE_PATH STRING, IMAGE_TITLE STRING);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, JSON JSONObject, INGREDIENTS STRING);");
         Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
     }
 
@@ -40,26 +42,51 @@ public class ImageDatabase extends SQLiteOpenHelper {
         }
 
     }
-    public void insert(String imagepath, String imagetitle){
+    public void insert(String name, JSONObject json, String ingredients){
         db = getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("IMAGE_PATH", imagepath);
-        cv.put("IMAGE_TITLE", imagetitle);
+        String s = json.toString();
+        cv.put("NAME", name);
+        cv.put("JSON_OBJECT", s);
+        cv.put("INGREDIENT_LIST", ingredients);
+
         db.insert(TABLE_NAME, null, cv);
     }
+
+    public Cursor getLatestProduct()
+    {
+        db = getReadableDatabase();
+        String query = "SELECT * FROM "  + TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+        while(cursor.moveToNext())
+        {
+            //just moving cursor to the end
+        }
+        cursor.moveToPrevious();
+        return cursor;
+    }
+
+    public Cursor getAllProducts()
+    {
+        db = getReadableDatabase();
+        String query = "SELECT * FROM "  + TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
     public Cursor view(){
         db = getReadableDatabase();
         //Cursor c = db.query(TABLE_NAME, new String[]{"FIRST_NAME", "LAST_NAME"}, null, null, null, null, "LAST_NAME ASC");
-        Cursor c = db.rawQuery("SELECT _id, IMAGE_PATH, IMAGE_TITLE FROM " + TABLE_NAME+";", null);
+        Cursor c = db.rawQuery("SELECT _id, JSON_OBJECT, INGREDIENTS FROM " + TABLE_NAME+";", null);
         return c;
     }
 
-    public void delete(int imageID, String imagetitle) {
+
+
+    public void delete(String name) {
         db = getWritableDatabase();
         //db.delete(TABLE_NAME, "FIRST_NAME = ? AND LAST_NAME = ?", new String[]{firstname, lastname});
-        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE _id = \"" + imageID + "\" OR IMAGE_TITLE = \"" + imagetitle + "\";");
-
-
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE PRODUCT_NAME = \"" + name + ";");
     }
 
     public int count() {
