@@ -6,7 +6,7 @@ import android.widget.ScrollView;
 import android.widget.LinearLayout;
 import android.view.View;
 
-public class History extends AppCompatActivity {
+public class HistoryActivity extends AppCompatActivity {
 
     ScrollView sv;
     LinearLayout ll;
@@ -14,7 +14,7 @@ public class History extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.history);
+        setContentView(R.layout.activity_history);
         sv = findViewById(R.id.scroll_view);
         ll = findViewById(R.id.linear_layout);
     }

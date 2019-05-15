@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.content.SharedPreferences;
 
-public class Settings extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     CheckBox vegan, vegetarian, pescatarian, allergies;
     EditText allergylist;
@@ -18,8 +18,8 @@ public class Settings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings);
-        sp = getSharedPreferences("jhmanalo.example.datadiet.settings", MODE_PRIVATE);
+        setContentView(R.layout.activity_settings);
+        sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
         vegan = findViewById(R.id.vegan_checkbox);
         vegetarian = findViewById(R.id.vegetarian_checkbox);
         pescatarian = findViewById(R.id.pescatarian_checkbox);
