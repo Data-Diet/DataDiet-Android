@@ -13,8 +13,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
     SQLiteDatabase db;
     Context ctx;
-    static String DB_NAME = "INGREDIENT_DATABASE";
-    static String TABLE_NAME = "INGREDIENT_TABLE";
+    static String DB_NAME = "PRODUCT_DATABASE";
+    static String TABLE_NAME = "PRODUCT_TABLE";
     static int VERSION = 1;
     public static String strSeparator = "_,_";
 
