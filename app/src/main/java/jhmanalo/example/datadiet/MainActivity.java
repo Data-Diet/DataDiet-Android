@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGetReference;
 
+    ProductDbHelper ProductDb;
+
     Context context;
 
     CameraView cameraView;
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         mDatabase = FirebaseDatabase.getInstance();
         mGetReference = mDatabase.getReference();
+
+        ProductDb = new ProductDbHelper(context, "INGREDIENT_DATABASE", null, 1);
 
         context = this;
 
@@ -219,7 +223,9 @@ public class MainActivity extends AppCompatActivity {
 
                 case FirebaseVisionBarcode.TYPE_PRODUCT:
                 {
-                    new JsonTask().execute("https://world.openfoodfacts.org/api/v1/product/" + item.getRawValue() + ".json");
+                    ProductDb.insert("", "https://world.openfoodfacts.org/api/v0/product/" + item.getRawValue() + ".json", "");
+                    Intent intent = new Intent(context, ProductActivity.class);
+                    startActivity(intent);
                 }
                 break;
 
@@ -255,143 +261,6 @@ public class MainActivity extends AppCompatActivity {
                 runDetector(image);
             } catch (Exception e) {
 
-            }
-        }
-    }
-
-    private class JsonTask extends AsyncTask<String, String, String> {
-
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("Retrieving product data");
-            pd.setCancelable(true);
-            pd.show();
-        }
-
-        protected String doInBackground(String... params) {
-
-
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-
-            try {
-                URL url = new URL(params[0]);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-
-
-                InputStream stream = connection.getInputStream();
-
-                reader = new BufferedReader(new InputStreamReader(stream));
-
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
-
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line+"\n");
-                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
-
-                }
-
-                return buffer.toString();
-
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (pd.isShowing()) {
-                pd.dismiss();
-            }
-
-            try {
-
-                JSONObject obj = new JSONObject(result);
-
-                linearLayout = findViewById(R.id.itemLayout);
-                scrollView = findViewById(R.id.itemScrollLayout);
-                ImageView productPicture = findViewById(R.id.productPic);
-                TextView productTitleView = findViewById(R.id.productTitle);
-
-                String imageURL = obj.getJSONObject("product").get("image_front_url").toString();
-                Log.d("JSON URL", imageURL);
-                String productTitle = obj.getJSONObject("product").get("product_name").toString();
-                Log.d("JSON Array", String.valueOf(obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()));
-
-                productTitleView.setText(productTitle);
-
-                Picasso.get()
-                        .load(imageURL)
-                        .resize(1000,1000)
-                        .centerCrop()
-                        .into(productPicture);
-
-                TextView labelTitle = new TextView(context);
-                labelTitle.setPadding(0,10,0,0);
-                labelTitle.setText(R.string.labelTitle);
-                labelTitle.setTextSize(20);
-                labelTitle.setTextColor(getResources().getColor(R.color.black));
-                linearLayout.addView(labelTitle);
-
-                int i = 0;
-                while (i < obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()) {
-                    TextView label = new TextView(context);
-                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("labels_hierarchy");
-                    label.setText(labelArray.get(i).toString().substring(3));
-                    label.setTextColor(getResources().getColor(R.color.black));
-                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                    linearLayout.addView(label);
-                    i++;
-                }
-
-                TextView ingredientsTitle = new TextView(context);
-                ingredientsTitle.setPadding(0,10,0,0);
-                ingredientsTitle.setText(R.string.ingredientsTitle);
-                ingredientsTitle.setTextSize(20);
-                ingredientsTitle.setTextColor(getResources().getColor(R.color.black));
-                linearLayout.addView(ingredientsTitle);
-
-                int j = 0;
-                while (j < obj.getJSONObject("product").getJSONArray("ingredients_tags").length()) {
-                    TextView label = new TextView(context);
-                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("ingredients_tags");
-                    label.setText(labelArray.get(j).toString().substring(3));
-                    label.setTextColor(getResources().getColor(R.color.black));
-                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                    linearLayout.addView(label);
-                    j++;
-                }
-
-                scrollView.bringToFront();
-                linearLayout.bringToFront();
-                scrollView.setVisibility(View.VISIBLE);
-
-                Log.d("My App", obj.toString());
-
-            } catch (Throwable t) {
-                Log.e("My App", "Could not parse malformed JSON: \"" + result + "\"");
-                Toast.makeText(context, "Sorry, product was not found", Toast.LENGTH_LONG).show();
-                cameraView.start();
             }
         }
     }
