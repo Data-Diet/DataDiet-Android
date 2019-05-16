@@ -98,6 +98,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
     public void erase() {
         db = getWritableDatabase();
-        onUpgrade(db, VERSION, VERSION + 1);
+        onUpgrade(db, VERSION, 1);
+
     }
 }
