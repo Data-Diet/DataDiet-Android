@@ -34,6 +34,9 @@ public class ProductActivity extends AppCompatActivity {
 
     Context context;
 
+    Cursor cursor;
+    String ProductURL;
+
     LinearLayout linearLayout;
     ScrollView scrollView;
 
@@ -41,14 +44,21 @@ public class ProductActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_product);
         context = this;
 
         ProductDb = new ProductDbHelper(context);
 
-        Cursor cursor = ProductDb.getLatestProduct();
+        cursor = ProductDb.getLatestProduct();
+        ProductURL = cursor.getString(cursor.getColumnIndex("PRODUCT_URL"));
 
-        new JsonTask().execute(cursor.getString(cursor.getColumnIndex("PRODUCT_URL")));
+        new JsonTask().execute(ProductURL);
 
+    }
+
+    public void closeProduct(View view) {
+        Intent intent = new Intent(context, MainActivity.class);
+        startActivity(intent);
     }
 
     private class JsonTask extends AsyncTask<String, String, String> {
@@ -117,7 +127,6 @@ public class ProductActivity extends AppCompatActivity {
             }
 
             try {
-
                 JSONObject obj = new JSONObject(result);
 
                 linearLayout = findViewById(R.id.itemLayout);
@@ -126,9 +135,14 @@ public class ProductActivity extends AppCompatActivity {
                 TextView productTitleView = findViewById(R.id.productTitle);
 
                 String imageURL = obj.getJSONObject("product").get("image_front_url").toString();
-                Log.d("JSON URL", imageURL);
-                String productTitle = obj.getJSONObject("product").get("product_name").toString();
+                Log.d("JSON URL", ProductURL);
+                String productTitle = obj.getJSONObject("product").get("brands").toString() + " " +
+                        obj.getJSONObject("product").get("product_name").toString();
+
                 Log.d("JSON Array", String.valueOf(obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()));
+
+                ProductDb.deleteURL(ProductURL);
+                ProductDb.insert(productTitle, ProductURL, "TBD");
 
                 productTitleView.setText(productTitle);
 
@@ -173,10 +187,6 @@ public class ProductActivity extends AppCompatActivity {
                     linearLayout.addView(label);
                     j++;
                 }
-
-                scrollView.bringToFront();
-                linearLayout.bringToFront();
-                scrollView.setVisibility(View.VISIBLE);
 
                 Log.d("My App", obj.toString());
 

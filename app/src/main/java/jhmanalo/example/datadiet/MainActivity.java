@@ -71,10 +71,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnImageGallery;
     Button btnHistory;
     AlertDialog waitingDialog;
-    ProgressDialog pd;
 
-    LinearLayout linearLayout;
-    ScrollView scrollView;
 
     public final static int PICK_PHOTO_CODE = 1046;
 
@@ -88,11 +85,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         cameraView.stop();
-    }
-
-    public void closeProduct(View view) {
-        scrollView.setVisibility(View.INVISIBLE);
-        cameraView.start();
     }
 
     @Override
@@ -222,7 +214,9 @@ public class MainActivity extends AppCompatActivity {
 
                 case FirebaseVisionBarcode.TYPE_PRODUCT:
                 {
-                    ProductDb.insert("", "https://world.openfoodfacts.org/api/v0/product/" + item.getRawValue() + ".json", "");
+                    String ProductURL = "https://world.openfoodfacts.org/api/v0/product/" + item.getRawValue() + ".json";
+                    ProductDb.deleteURL(ProductURL);
+                    ProductDb.insert("", ProductURL, "");
                     Intent intent = new Intent(context, ProductActivity.class);
                     startActivity(intent);
                 }

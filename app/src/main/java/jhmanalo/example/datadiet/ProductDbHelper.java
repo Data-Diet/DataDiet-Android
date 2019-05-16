@@ -80,12 +80,16 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         return c;
     }
 
-
-
-    public void delete(String name) {
+    public void deleteName(String name) {
         db = getWritableDatabase();
         //db.delete(TABLE_NAME, "FIRST_NAME = ? AND LAST_NAME = ?", new String[]{firstname, lastname});
-        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE PRODUCT_NAME = \"" + name + ";");
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE PRODUCT_NAME = \"" + name + "\";");
+    }
+
+    public void deleteURL(String url) {
+        db = getWritableDatabase();
+        //db.delete(TABLE_NAME, "FIRST_NAME = ? AND LAST_NAME = ?", new String[]{firstname, lastname});
+        db.execSQL("DELETE FROM " + TABLE_NAME + " WHERE PRODUCT_URL = \"" + url + "\";");
     }
 
     public int count() {
