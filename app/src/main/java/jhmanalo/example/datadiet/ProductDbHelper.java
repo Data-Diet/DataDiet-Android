@@ -18,11 +18,9 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     static int VERSION = 1;
     public static String strSeparator = "_,_";
 
-    public ProductDbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public ProductDbHelper(Context context) {
+        super(context, DB_NAME, null, 1);
         ctx = context;
-        VERSION = version;
-        DB_NAME = name;
     }
 
     @Override

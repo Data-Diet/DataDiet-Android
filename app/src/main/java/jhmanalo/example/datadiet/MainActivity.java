@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance();
         mGetReference = mDatabase.getReference();
 
-        ProductDb = new ProductDbHelper(context, "INGREDIENT_DATABASE", null, 1);
+        ProductDb = new ProductDbHelper(context);
 
         context = this;
 
