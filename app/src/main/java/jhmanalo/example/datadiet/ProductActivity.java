@@ -43,7 +43,7 @@ public class ProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         context = this;
 
-        ProductDb = new ProductDbHelper(context, "INGREDIENT_DATABASE", null, 1);
+        ProductDb = new ProductDbHelper(context, "PRODUCT_DATABASE", null, 1);
 
         Cursor cursor = ProductDb.getLatestProduct();
 
