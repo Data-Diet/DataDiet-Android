@@ -98,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
+        context = this;
+
         mDatabase = FirebaseDatabase.getInstance();
         mGetReference = mDatabase.getReference();
 
         ProductDb = new ProductDbHelper(context);
-
-        context = this;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
