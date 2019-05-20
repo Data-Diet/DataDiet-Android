@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.StringTokenizer;
 
 public class ProductActivity extends AppCompatActivity {
 
@@ -61,13 +62,128 @@ public class ProductActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+//    public String allergenCheck(String ingredients) {
+//        try {
+//            StringTokenizer ingrtTknzr = new StringTokenizer(ingredients, ",");
+//
+//            int i = 0;
+//            while (ingrtTknzr.hasMoreTokens()) {
+//            }
+//
+//        } catch (Exception e) {
+//
+//        }
+//    }
+
+    public void displayProduct (JSONObject obj){
+        String imageURL = null;
+        String productTitle = null;
+
+        JSONArray JSONlabelArray = null;
+        JSONArray JSONIngrArray = null;
+
+        int labelsLen = 0;
+        int ingredientsLen = 0;
+
+        try {
+            imageURL = obj.getJSONObject("product").get("image_front_url").toString();
+            productTitle = obj.getJSONObject("product").get("brands").toString() + " " +
+                    obj.getJSONObject("product").get("product_name").toString();
+        } catch (Exception e) {
+            Log.e("Display Data", "error retrieving JSON title data");
+        }
+
+        try {
+            JSONlabelArray = obj.getJSONObject("product").getJSONArray("labels_hierarchy");
+            labelsLen = JSONlabelArray.length();
+        } catch (Exception e) {
+            Log.e("Display Data", "error retrieving labels JSON data");
+        }
+
+        try {
+            JSONIngrArray = obj.getJSONObject("product").getJSONArray("ingredients_tags");
+            ingredientsLen = JSONIngrArray.length();
+        } catch (Exception e) {
+            Log.e("Display Data", "error retrieving ingredients JSON data");
+        }
+
+
+        linearLayout = findViewById(R.id.itemLayout);
+        scrollView = findViewById(R.id.itemScrollLayout);
+        ImageView productPicture = findViewById(R.id.productPic);
+        TextView productTitleView = findViewById(R.id.productTitle);
+
+        Log.d("JSON URL", ProductURL);
+        Log.d("product ingredients", String.valueOf(ingredientsLen));
+
+
+        ProductDb.deleteURL(ProductURL);
+        ProductDb.insert(productTitle, ProductURL, "TBD");
+
+        productTitleView.setText(productTitle);
+
+        Picasso.get()
+                .load(imageURL)
+                .resize(1000,1000)
+                .centerCrop()
+                .into(productPicture);
+
+        if (JSONlabelArray != null) {
+            TextView labelTitle = new TextView(context);
+            labelTitle.setPadding(0,10,0,0);
+            labelTitle.setText(R.string.labelTitle);
+            labelTitle.setTextSize(20);
+            labelTitle.setTextColor(getResources().getColor(R.color.black));
+            linearLayout.addView(labelTitle);
+
+            int i = 0;
+            while (i < labelsLen) {
+                TextView label = new TextView(context);
+                try {
+                    label.setText(JSONlabelArray.get(i).toString().substring(3));
+                } catch (Exception e) {
+                    Log.d("product Label", "could not parse element " + i + " from label");
+                }
+                label.setTextColor(getResources().getColor(R.color.black));
+                label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                linearLayout.addView(label);
+                i++;
+            }
+        }
+
+        TextView ingredientsTitle = new TextView(context);
+        ingredientsTitle.setPadding(0,10,0,0);
+        ingredientsTitle.setText(R.string.ingredientsTitle);
+        ingredientsTitle.setTextSize(20);
+        ingredientsTitle.setTextColor(getResources().getColor(R.color.black));
+        linearLayout.addView(ingredientsTitle);
+
+        int j = 0;
+        while (j < ingredientsLen) {
+            TextView ingredient = new TextView(context);
+            try {
+                ingredient.setText(JSONIngrArray.get(j).toString().substring(3));
+                Log.d("product ingredients", ingredient.getText().toString());
+
+            } catch (Exception e){
+                Log.d("product ingredients", "could not parse element " + j + " from ingredients");
+            }
+            ingredient.setTextColor(getResources().getColor(R.color.black));
+            ingredient.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            linearLayout.addView(ingredient);
+            j++;
+        }
+
+        Log.d("My App", obj.toString());
+    }
+
     private class JsonTask extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
             super.onPreExecute();
 
             ProgressData = new ProgressDialog(context);
-            ProgressData.setMessage("Retrieving product data");
+            ProgressData.setMessage("Checking for Product");
             ProgressData.setCancelable(true);
             ProgressData.show();
         }
@@ -126,76 +242,20 @@ public class ProductActivity extends AppCompatActivity {
                 ProgressData.dismiss();
             }
 
+            JSONObject obj = null;
+
             try {
-                JSONObject obj = new JSONObject(result);
-
-                linearLayout = findViewById(R.id.itemLayout);
-                scrollView = findViewById(R.id.itemScrollLayout);
-                ImageView productPicture = findViewById(R.id.productPic);
-                TextView productTitleView = findViewById(R.id.productTitle);
-
-                String imageURL = obj.getJSONObject("product").get("image_front_url").toString();
-                Log.d("JSON URL", ProductURL);
-                String productTitle = obj.getJSONObject("product").get("brands").toString() + " " +
-                        obj.getJSONObject("product").get("product_name").toString();
-
-                Log.d("JSON Array", String.valueOf(obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()));
-
-                ProductDb.deleteURL(ProductURL);
-                ProductDb.insert(productTitle, ProductURL, "TBD");
-
-                productTitleView.setText(productTitle);
-
-                Picasso.get()
-                        .load(imageURL)
-                        .resize(1000,1000)
-                        .centerCrop()
-                        .into(productPicture);
-
-                TextView labelTitle = new TextView(context);
-                labelTitle.setPadding(0,10,0,0);
-                labelTitle.setText(R.string.labelTitle);
-                labelTitle.setTextSize(20);
-                labelTitle.setTextColor(getResources().getColor(R.color.black));
-                linearLayout.addView(labelTitle);
-
-                int i = 0;
-                while (i < obj.getJSONObject("product").getJSONArray("labels_hierarchy").length()) {
-                    TextView label = new TextView(context);
-                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("labels_hierarchy");
-                    label.setText(labelArray.get(i).toString().substring(3));
-                    label.setTextColor(getResources().getColor(R.color.black));
-                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                    linearLayout.addView(label);
-                    i++;
-                }
-
-                TextView ingredientsTitle = new TextView(context);
-                ingredientsTitle.setPadding(0,10,0,0);
-                ingredientsTitle.setText(R.string.ingredientsTitle);
-                ingredientsTitle.setTextSize(20);
-                ingredientsTitle.setTextColor(getResources().getColor(R.color.black));
-                linearLayout.addView(ingredientsTitle);
-
-                int j = 0;
-                while (j < obj.getJSONObject("product").getJSONArray("ingredients_tags").length()) {
-                    TextView label = new TextView(context);
-                    JSONArray labelArray = (JSONArray) obj.getJSONObject("product").get("ingredients_tags");
-                    label.setText(labelArray.get(j).toString().substring(3));
-                    label.setTextColor(getResources().getColor(R.color.black));
-                    label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                    linearLayout.addView(label);
-                    j++;
-                }
-
-                Log.d("My App", obj.toString());
+                obj = new JSONObject(result);
 
             } catch (Throwable t) {
-                Intent intent = new Intent(context, MainActivity.class);
-                startActivity(intent);
                 Log.e("My App", "Could not parse malformed JSON: \"" + result + "\"");
                 Toast.makeText(context, "Sorry, product was not found", Toast.LENGTH_LONG).show();
+                ProductDb.deleteURL(ProductURL);
+                Intent intent = new Intent(context, MainActivity.class);
+                startActivity(intent);
             }
+
+            displayProduct(obj);
         }
     }
 }

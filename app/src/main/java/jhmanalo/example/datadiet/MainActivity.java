@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.camerakit.CameraKitView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
@@ -45,6 +48,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -65,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     Context context;
 
-    CameraView cameraView;
+    private CameraKitView cameraView;
     Button btnDetect;
     Button btnSettings;
     Button btnImageGallery;
@@ -76,15 +81,27 @@ public class MainActivity extends AppCompatActivity {
     public final static int PICK_PHOTO_CODE = 1046;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        cameraView.onStart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        cameraView.start();
+        cameraView.onResume();
     }
 
     @Override
     protected void onPause() {
+        cameraView.onPause();
         super.onPause();
-        cameraView.stop();
+    }
+
+    @Override
+    protected void onStop() {
+        cameraView.onStop();
+        super.onStop();
     }
 
     @Override
@@ -102,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        cameraView = findViewById(R.id.cameraview);
+        cameraView = findViewById(R.id.camera);
         btnDetect = findViewById(R.id.btndetect);
         btnImageGallery = findViewById(R.id.btnimagegallery);
         btnSettings = findViewById(R.id.btnsettings);
@@ -118,38 +135,18 @@ public class MainActivity extends AppCompatActivity {
         btnDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraView.start();
-                cameraView.captureImage();
+                cameraView.captureImage(new  CameraKitView.ImageCallback() {
+                    @Override
+                    public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
+                        waitingDialog.show();
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(capturedImage, 0, capturedImage.length);
+                        bitmap = Bitmap.createScaledBitmap(bitmap, cameraView.getWidth(), cameraView.getHeight(), false);
+
+                        runDetector(bitmap);
+                    }
+                });
             }
         });
-
-        cameraView.addCameraKitListener(new CameraKitEventListener() {
-            @Override
-            public void onEvent(CameraKitEvent cameraKitEvent) {
-
-            }
-
-            @Override
-            public void onError(CameraKitError cameraKitError) {
-
-            }
-
-            @Override
-            public void onImage(CameraKitImage cameraKitImage) {
-                waitingDialog.show();
-                Bitmap bitmap = cameraKitImage.getBitmap();
-                bitmap = Bitmap.createScaledBitmap(bitmap, cameraView.getWidth(), cameraView.getHeight(), false);
-                cameraView.stop();
-
-                runDetector(bitmap);
-            }
-
-            @Override
-            public void onVideo(CameraKitVideo cameraKitVideo) {
-
-            }
-        });
-
     }
 
     private void runDetector(Bitmap bitmap) {
@@ -171,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
                             processResult(firebaseVisionBarcodes);
                         else {
                             Toast.makeText(context, "Unable to detect valid barcode", Toast.LENGTH_LONG).show();
-                            cameraView.start();
                             waitingDialog.dismiss();
                         }
                     }
@@ -256,5 +252,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
