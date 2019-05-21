@@ -70,6 +70,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         db = getReadableDatabase();
         String query = "SELECT * FROM "  + TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
+        if (cursor != null)
+            cursor.moveToFirst();
         return cursor;
     }
 
