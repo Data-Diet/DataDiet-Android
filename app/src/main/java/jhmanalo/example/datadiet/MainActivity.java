@@ -164,11 +164,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(List<FirebaseVisionBarcode> firebaseVisionBarcodes) {
                         Log.d("detectInImage", String.valueOf(firebaseVisionBarcodes.size()));
-                        if (firebaseVisionBarcodes.size() > 0)
-                            processResult(firebaseVisionBarcodes);
+                        if (firebaseVisionBarcodes.size() != 0) {
+                            if (firebaseVisionBarcodes.size() == 1)
+                                processResult(firebaseVisionBarcodes);
+                            else {
+                                Toast.makeText(context, "Please make sure only one barcode is scanned.", Toast.LENGTH_LONG).show();
+                                waitingDialog.dismiss();
+                            }
+                        }
                         else {
                             Toast.makeText(context, "Unable to detect valid barcode", Toast.LENGTH_LONG).show();
                             waitingDialog.dismiss();
+
                         }
                     }
                 })
