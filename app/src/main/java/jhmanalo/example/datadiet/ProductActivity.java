@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -27,6 +29,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class ProductActivity extends AppCompatActivity {
@@ -41,6 +46,11 @@ public class ProductActivity extends AppCompatActivity {
     LinearLayout linearLayout;
     ScrollView scrollView;
 
+    ExpandableListView expandableListView;
+    ExpandableListAdapter expandableListAdapter;
+    List<String> expandableListTitle;
+    HashMap<String, List<String>> expandableListDetail;
+
     ProgressDialog ProgressData;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +60,13 @@ public class ProductActivity extends AppCompatActivity {
 
         ProductDb = new ProductDbHelper(context);
 
+        expandableListDetail = new HashMap<>();
+
         cursor = ProductDb.getLatestProduct();
         ProductURL = cursor.getString(cursor.getColumnIndex("PRODUCT_URL"));
 
         new JsonTask().execute(ProductURL);
+
     }
 
     public void closeProduct(View view) {
@@ -111,6 +124,8 @@ public class ProductActivity extends AppCompatActivity {
         scrollView = findViewById(R.id.itemScrollLayout);
         ImageView productPicture = findViewById(R.id.productPic);
         TextView productTitleView = findViewById(R.id.productTitle);
+        expandableListView = findViewById(R.id.productItemList);
+
 
         Log.d("JSON URL", ProductURL);
         Log.d("product ingredients", String.valueOf(ingredientsLen));
@@ -150,28 +165,28 @@ public class ProductActivity extends AppCompatActivity {
             }
         }
 
-        TextView ingredientsTitle = new TextView(context);
-        ingredientsTitle.setPadding(0,10,0,0);
-        ingredientsTitle.setText(R.string.ingredientsTitle);
-        ingredientsTitle.setTextSize(20);
-        ingredientsTitle.setTextColor(getResources().getColor(R.color.black));
-        linearLayout.addView(ingredientsTitle);
-
+        ArrayList<String> ingredientsList = new ArrayList<>();
         int j = 0;
         while (j < ingredientsLen) {
-            TextView ingredient = new TextView(context);
             try {
-                ingredient.setText(JSONIngrArray.get(j).toString().substring(3));
-                Log.d("product ingredients", ingredient.getText().toString());
+                ingredientsList.add(JSONIngrArray.get(j).toString().substring(3));
 
             } catch (Exception e){
                 Log.d("product ingredients", "could not parse element " + j + " from ingredients");
             }
-            ingredient.setTextColor(getResources().getColor(R.color.black));
-            ingredient.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            linearLayout.addView(ingredient);
             j++;
         }
+
+        if (!ingredientsList.isEmpty())
+            expandableListDetail.put("Ingredients", ingredientsList);
+
+        expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
+
+        if (expandableListDetail != null)
+            expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
+
+        if (expandableListAdapter != null)
+        expandableListView.setAdapter(expandableListAdapter);
 
         Log.d("My App", obj.toString());
     }
@@ -258,3 +273,4 @@ public class ProductActivity extends AppCompatActivity {
         }
     }
 }
+
