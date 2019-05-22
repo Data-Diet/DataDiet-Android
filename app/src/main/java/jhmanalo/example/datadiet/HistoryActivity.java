@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.util.Log;
 import android.widget.TextView;
+import android.content.Intent;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -47,8 +48,10 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     public void displayProductList() {
-        cursor = productDB.getAllProducts();
-        while (cursor.moveToNext())
+        cursor = productDB.getLatestProduct();
+        Log.d("HistoryActivity", "displayProduct " + cursor.getString(1));
+        listItems.add(cursor.getString(1));
+        while (cursor.moveToPrevious())
             listItems.add(cursor.getString(1));
         adapter = new ArrayAdapter<>(this, R.layout.list_view_product, R.id.productName, listItems);
         listView.setAdapter(adapter);
@@ -109,7 +112,18 @@ public class HistoryActivity extends AppCompatActivity {
         @Override
         public boolean onSingleTapUp(MotionEvent motionEvent) {
             Log.d("HistoryActivity", "OnSingleTap");
-            return true;
+            int tapIndex = getIndexOfGesture(motionEvent);
+            View listItemTapped = listView.getChildAt(tapIndex);
+            if (listItemTapped != null) {
+                TextView product = listItemTapped.findViewById(R.id.productName);
+                String productName = product.getText().toString();
+                String productURL = getProductURL(productName);
+                String productIngredients = getProductIngredients(productName);
+                productDB.deleteName(productName);
+                productDB.insert(productName, productURL, productIngredients);
+                Intent intent = new Intent(HistoryActivity.this, ProductActivity.class);
+                startActivity(intent);
+            } return true;
         }
 
         @Override
@@ -124,11 +138,42 @@ public class HistoryActivity extends AppCompatActivity {
             return true;
         }
 
-        private void showDeleteButton(MotionEvent motionEvent) {
+        private int getIndexOfGesture(MotionEvent motionEvent) {
             int adapterIndex = listView.pointToPosition((int) motionEvent.getX(), (int) motionEvent.getY());
             int firstViewItemIndex = listView.getFirstVisiblePosition();
             int viewIndex = adapterIndex - firstViewItemIndex;
-            listItemSwiped = listView.getChildAt(viewIndex);
+            return viewIndex;
+        }
+
+        private String getProductURL(String productName) {
+            String productPresent, productURL = "";
+            Boolean found = false;
+            Cursor cursor = productDB.getAllProducts();
+            while (cursor.moveToNext() && !found) {
+                productPresent = cursor.getString(1);
+                if (productPresent.equals(productName)) {
+                    productURL = cursor.getString(2);
+                    found = true;
+                }
+            } return productURL;
+        }
+
+        private String getProductIngredients(String productName) {
+            String productPresent, productIngredients = "";
+            Boolean found = false;
+            Cursor cursor = productDB.getAllProducts();
+            while (cursor.moveToNext() && !found) {
+                productPresent = cursor.getString(1);
+                if (productPresent.equals(productName)) {
+                    productIngredients = cursor.getString(3);
+                    found = true;
+                }
+            } return productIngredients;
+        }
+
+        private void showDeleteButton(MotionEvent motionEvent) {
+            int swipeIndex = getIndexOfGesture(motionEvent);
+            listItemSwiped = listView.getChildAt(swipeIndex);
             delete = listItemSwiped.findViewById(R.id.deleteButton);
             delete.setVisibility(View.VISIBLE);
             delete.setOnClickListener(new View.OnClickListener() {

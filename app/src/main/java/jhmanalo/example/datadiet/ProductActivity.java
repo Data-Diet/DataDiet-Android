@@ -54,7 +54,6 @@ public class ProductActivity extends AppCompatActivity {
         ProductURL = cursor.getString(cursor.getColumnIndex("PRODUCT_URL"));
 
         new JsonTask().execute(ProductURL);
-
     }
 
     public void closeProduct(View view) {

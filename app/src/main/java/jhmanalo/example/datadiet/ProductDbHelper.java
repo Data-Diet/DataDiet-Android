@@ -37,7 +37,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME + ";");
             VERSION = newVersion;
             onCreate(db);
-            Toast.makeText(ctx, "TABLE IS UPGRAED", Toast.LENGTH_LONG).show();
+            Toast.makeText(ctx, "TABLE IS UPGRADED", Toast.LENGTH_LONG).show();
         }
 
     }
@@ -70,16 +70,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
         db = getReadableDatabase();
         String query = "SELECT * FROM "  + TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
-        if (cursor != null)
-            cursor.moveToFirst();
         return cursor;
-    }
-
-    public Cursor view(){
-        db = getReadableDatabase();
-        //Cursor c = db.query(TABLE_NAME, new String[]{"FIRST_NAME", "LAST_NAME"}, null, null, null, null, "LAST_NAME ASC");
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME+";", null);
-        return c;
     }
 
     public void deleteName(String name) {
