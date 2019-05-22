@@ -91,6 +91,16 @@
             tools:layout_conversion_absoluteHeight="30dp"
             tools:layout_conversion_absoluteWidth="30dp" />
 
+        <jhmanalo.example.datadiet.camera.CameraSourcePreview
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <jhmanalo.example.datadiet.camera.GraphicOverlay
+                android:id="@+id/graphicOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </jhmanalo.example.datadiet.camera.CameraSourcePreview>
+
     </android.support.constraint.ConstraintLayout>
 
 </RelativeLayout>
