@@ -266,6 +266,6 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-    
+
 
 }
