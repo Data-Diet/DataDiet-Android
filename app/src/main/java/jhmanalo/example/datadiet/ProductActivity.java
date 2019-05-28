@@ -273,4 +273,3 @@ public class ProductActivity extends AppCompatActivity {
         }
     }
 }
-
