@@ -4,9 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListAdapter;
@@ -89,6 +93,7 @@ public class ProductActivity extends AppCompatActivity {
 
     public void displayProduct (JSONObject obj){
         String imageURL = null;
+        String productBrand = null;
         String productTitle = null;
 
         JSONArray JSONlabelArray = null;
@@ -99,7 +104,8 @@ public class ProductActivity extends AppCompatActivity {
 
         try {
             imageURL = obj.getJSONObject("product").get("image_front_url").toString();
-            productTitle = obj.getJSONObject("product").get("brands").toString() + " " +
+            productBrand = obj.getJSONObject("product").get("brands").toString();
+            productTitle = productBrand + " " +
                     obj.getJSONObject("product").get("product_name").toString();
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving JSON title data");
@@ -119,6 +125,11 @@ public class ProductActivity extends AppCompatActivity {
             Log.e("Display Data", "error retrieving ingredients JSON data");
         }
 
+        final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
+        final StyleSpan iss = new StyleSpan(Typeface.ITALIC); //Span to make text italic
+
+        SpannableString productTitleText = new SpannableString(productTitle);
+        productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
 
         linearLayout = findViewById(R.id.itemLayout);
         scrollView = findViewById(R.id.itemScrollLayout);
@@ -134,7 +145,7 @@ public class ProductActivity extends AppCompatActivity {
         ProductDb.deleteURL(ProductURL);
         ProductDb.insert(productTitle, ProductURL, "TBD");
 
-        productTitleView.setText(productTitle);
+        productTitleView.setText(productTitleText);
 
         Picasso.get()
                 .load(imageURL)
@@ -142,43 +153,16 @@ public class ProductActivity extends AppCompatActivity {
                 .centerCrop()
                 .into(productPicture);
 
-        if (JSONlabelArray != null) {
-            TextView labelTitle = new TextView(context);
-            labelTitle.setPadding(0,10,0,0);
-            labelTitle.setText(R.string.labelTitle);
-            labelTitle.setTextSize(20);
-            labelTitle.setTextColor(getResources().getColor(R.color.black));
-            linearLayout.addView(labelTitle);
-
-            int i = 0;
-            while (i < labelsLen) {
-                TextView label = new TextView(context);
-                try {
-                    label.setText(JSONlabelArray.get(i).toString().substring(3));
-                } catch (Exception e) {
-                    Log.d("product Label", "could not parse element " + i + " from label");
-                }
-                label.setTextColor(getResources().getColor(R.color.black));
-                label.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-                linearLayout.addView(label);
-                i++;
-            }
-        }
-
+        ArrayList<String> labelsList = new ArrayList<>();
         ArrayList<String> ingredientsList = new ArrayList<>();
-        int j = 0;
-        while (j < ingredientsLen) {
-            try {
-                ingredientsList.add(JSONIngrArray.get(j).toString().substring(3));
 
-            } catch (Exception e){
-                Log.d("product ingredients", "could not parse element " + j + " from ingredients");
-            }
-            j++;
-        }
+        makeDropdownList(JSONlabelArray, labelsLen, labelsList, "labels");
+        makeDropdownList(JSONIngrArray, ingredientsLen, ingredientsList, "ingredients");
 
         if (!ingredientsList.isEmpty())
             expandableListDetail.put("Ingredients", ingredientsList);
+        if (!labelsList.isEmpty())
+            expandableListDetail.put("Labels", labelsList);
 
         expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
 
@@ -189,6 +173,21 @@ public class ProductActivity extends AppCompatActivity {
         expandableListView.setAdapter(expandableListAdapter);
 
         Log.d("My App", obj.toString());
+    }
+
+    public void makeDropdownList(JSONArray JArray, int JArrayLen, ArrayList<String> List, String listType) {
+        if (JArray != null) {
+            int i = 0;
+            while (i < JArrayLen) {
+                try {
+                    List.add(JArray.get(i).toString().substring(3));
+
+                } catch (Exception e) {
+                    Log.d("product " + listType, "could not parse element " + i + " from ingredients");
+                }
+                i++;
+            }
+        }
     }
 
     private class JsonTask extends AsyncTask<String, String, String> {
