@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -82,25 +83,34 @@ public class ProductActivity extends AppCompatActivity {
 
     public List<String> allergenCheck(String ingredients) {
         ArrayList<String> allergensFound = new ArrayList<String>();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences preferences = this.getSharedPreferences(
+                "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
         Boolean allergiesChecked = preferences.getBoolean("allergiesChecked", false);
         Boolean veganChecked = preferences.getBoolean("allergiesChecked", false);
         Boolean vegetarianChecked = preferences.getBoolean("allergiesChecked", false);
         Boolean pescatarianChecked = preferences.getBoolean("allergiesChecked", false);
+        Log.d("allergy check", allergiesChecked.toString());
+
 
         if (allergiesChecked) {
-            try {
-                StringTokenizer ingrtTknzr = new StringTokenizer(ingredients, ",");
-                StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",");
+            HashSet<String> allergiesSet = new HashSet();
+            StringTokenizer ingredientList = new StringTokenizer(ingredients, ",.:[]() ");
+            StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",.:[]() ");
 
+            while (allergyList.hasMoreTokens()) {
+                String allergen = allergyList.nextToken().toLowerCase();
+                allergiesSet.add(allergen);
+                Log.d("allergy check", allergen);
+            }
 
-                int i = 0;
-                while (ingrtTknzr.hasMoreTokens()) {
+            while (ingredientList.hasMoreTokens()) {
+                String ingredient = ingredientList.nextToken().toLowerCase();
+                if (allergiesSet.contains(ingredient)) {
+                    Log.d("allergy check", "found: " + ingredient);
+                    allergensFound.add(ingredient);
 
                 }
-
-            } catch (Exception e) {
-
+                Log.d("allergy check", ingredient);
             }
         }
         return allergensFound;
@@ -138,6 +148,13 @@ public class ProductActivity extends AppCompatActivity {
             ingredientsLen = JSONIngrArray.length();
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving ingredients JSON data");
+        }
+
+        try{
+            allergenCheck(obj.getJSONObject("product").getString("ingredients_text"));
+        } catch (Exception e) {
+            Log.e("Display Data", "error retrieving allergen check");
+
         }
 
         final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
@@ -274,6 +291,12 @@ public class ProductActivity extends AppCompatActivity {
 
             try {
                 obj = new JSONObject(result);
+                if (Integer.parseInt(obj.getString("status")) == 0) {
+                    Toast.makeText(context, "Sorry, product was not found1", Toast.LENGTH_LONG).show();
+                    ProductDb.deleteURL(ProductURL);
+                    Intent intent = new Intent(context, MainActivity.class);
+                    startActivity(intent);
+                }
 
             } catch (Throwable t) {
                 Log.e("My App", "Could not parse malformed JSON: \"" + result + "\"");
@@ -282,8 +305,8 @@ public class ProductActivity extends AppCompatActivity {
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
             }
-
             displayProduct(obj);
+
         }
     }
 }
