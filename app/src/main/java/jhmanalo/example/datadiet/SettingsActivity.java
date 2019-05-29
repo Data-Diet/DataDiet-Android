@@ -13,7 +13,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     CheckBox vegan, vegetarian, pescatarian, allergies;
     EditText allergylist;
-    SharedPreferences sp;
+    public SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
