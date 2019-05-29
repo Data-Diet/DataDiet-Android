@@ -84,7 +84,7 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     // A TextToSpeech engine for speaking a String value.
     private TextToSpeech tts;
-    SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
+    //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
 
     /**
      * Initializes the UI and creates the detector pipeline.
