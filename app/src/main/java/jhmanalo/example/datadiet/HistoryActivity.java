@@ -37,24 +37,23 @@ public class HistoryActivity extends AppCompatActivity {
         productDB = new ProductDbHelper(this);
         cursor = productDB.getAllProducts();
         listItems = new ArrayList<>();
-        if (cursor.getCount() == 0)
-            Toast.makeText(this, "No history to display", Toast.LENGTH_LONG).show();
-        else {
-            displayProductList();
-            View productListView = findViewById(R.id.list_view);
-            gestureDetector = new GestureDetector(this, new GestureListener());
-            productListView.setOnTouchListener(touchListener);
-        }
+        displayProductList();
+        View productListView = findViewById(R.id.list_view);
+        gestureDetector = new GestureDetector(this, new GestureListener());
+        productListView.setOnTouchListener(touchListener);
     }
 
     public void displayProductList() {
-        cursor = productDB.getLatestProduct();
-        Log.d("HistoryActivity", "displayProduct " + cursor.getString(1));
-        listItems.add(cursor.getString(1));
-        while (cursor.moveToPrevious())
-            listItems.add(cursor.getString(1));
-        adapter = new ArrayAdapter<>(this, R.layout.list_view_product, R.id.productName, listItems);
-        listView.setAdapter(adapter);
+        if (productDB.getAllProducts().getCount() != 0) {
+            cursor = productDB.getLatestProduct();
+            Log.d("HistoryActivity", "displayProduct " + cursor.getString(1));
+            do {
+                listItems.add(cursor.getString(1));
+            } while (cursor.moveToPrevious());
+            adapter = new ArrayAdapter<>(this, R.layout.list_view_product, R.id.productName, listItems);
+            listView.setAdapter(adapter);
+        } else
+            Toast.makeText(this, "No history to display", Toast.LENGTH_LONG).show();
     }
 
     public void showPopUp(View view) {
@@ -131,7 +130,7 @@ public class HistoryActivity extends AppCompatActivity {
             Log.d("HistoryActivity", "OnFling");
             float diffX = mEvent1.getX() - mEvent2.getX();
             float diffY = mEvent1.getY() - mEvent2.getY();
-            if ((diffX > diffY) && (diffX > minSwipeDistance) && (velocityX > minSwipeVelocity)) {
+            if (diffX > diffY) {
                 Log.d("HistoryActivity", "OnFling Success");
                 showDeleteButton(mEvent1);
             }
