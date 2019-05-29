@@ -90,21 +90,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         cameraView.onResume();
-        btnDetect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraView.captureImage(new  CameraKitView.ImageCallback() {
-                    @Override
-                    public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
-                        waitingDialog.show();
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(capturedImage, 0, capturedImage.length);
-                        bitmap = Bitmap.createScaledBitmap(bitmap, cameraView.getWidth(), cameraView.getHeight(), false);
-
-                        runDetector(bitmap);
-                    }
-                });
-            }
-        });
     }
 
     @Override
