@@ -3,10 +3,12 @@ package jhmanalo.example.datadiet;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -78,18 +80,31 @@ public class ProductActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-//    public String allergenCheck(String ingredients) {
-//        try {
-//            StringTokenizer ingrtTknzr = new StringTokenizer(ingredients, ",");
-//
-//            int i = 0;
-//            while (ingrtTknzr.hasMoreTokens()) {
-//            }
-//
-//        } catch (Exception e) {
-//
-//        }
-//    }
+    public List<String> allergenCheck(String ingredients) {
+        ArrayList<String> allergensFound = new ArrayList<String>();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Boolean allergiesChecked = preferences.getBoolean("allergiesChecked", false);
+        Boolean veganChecked = preferences.getBoolean("allergiesChecked", false);
+        Boolean vegetarianChecked = preferences.getBoolean("allergiesChecked", false);
+        Boolean pescatarianChecked = preferences.getBoolean("allergiesChecked", false);
+
+        if (allergiesChecked) {
+            try {
+                StringTokenizer ingrtTknzr = new StringTokenizer(ingredients, ",");
+                StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",");
+
+
+                int i = 0;
+                while (ingrtTknzr.hasMoreTokens()) {
+
+                }
+
+            } catch (Exception e) {
+
+            }
+        }
+        return allergensFound;
+    }
 
     public void displayProduct (JSONObject obj){
         String imageURL = null;
