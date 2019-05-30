@@ -15,6 +15,12 @@
  */
 package jhmanalo.example.datadiet;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -22,16 +28,38 @@ import android.util.SparseArray;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 
+import org.jetbrains.annotations.Nullable;
+
 import jhmanalo.example.datadiet.camera.GraphicOverlay;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A very simple Processor which gets detected TextBlocks and adds them to the overlay
  * as OcrGraphics.
  * TODO: Make this implement Detector.Processor<TextBlock> and add text to the GraphicOverlay
  */
-public class OcrDetectorProcessor implements Detector.Processor<TextBlock>{
+public class OcrDetectorProcessor extends AppCompatActivity implements Detector.Processor<TextBlock> {
 
     private GraphicOverlay<OcrGraphic> graphicOverlay;
+
+    SettingsActivity settings = new SettingsActivity();
+
+    Boolean allergiesChecked = false;
+    String allergies;
+    String[] allergyList;
+
+    /*@Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
+        allergiesChecked = sp.getBoolean("allergiesChecked", false);
+        Log.d("processor on create", "allergiesChecked is " + allergiesChecked);
+        allergies = sp.getString("allergylist", "");
+        allergyList = allergies.split(",");
+    }*/
+
 
     OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
         graphicOverlay = ocrGraphicOverlay;
@@ -40,6 +68,7 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock>{
     // TODO:  Once this implements Detector.Processor<TextBlock>, implement the abstract methods.
     @Override
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
+        //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
         graphicOverlay.clear();
         SparseArray<TextBlock> items = detections.getDetectedItems();
         for (int i = 0; i < items.size(); ++i) {
@@ -48,9 +77,35 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock>{
                 Log.d("Processor", "Text detected! " + item.getValue());
                 OcrGraphic graphic = new OcrGraphic(graphicOverlay, item);
                 graphicOverlay.add(graphic);
+
+                if (allergiesChecked) {
+                    for (String str : allergyList) {
+                        str.trim();
+                    }
+                    for (String s : allergyList) {
+                        String[] tokens = item.getValue().split(" ");
+                        for (String t : tokens) {
+                            Log.d("processor", "value of s: " + s);
+                            Log.d("processor", "value of t: " + t);
+                            if (s.toLowerCase().equals(t.toLowerCase())) {
+                                Log.d("processor", "shared preference detected: " + s);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+
+    /*public String[] getDetectedWords(Detector.Detections<TextBlock> detections)
+    {
+        SparseArray<TextBlock> items = detections.getDetectedItems();
+
+        for (int i = 0; i < items.size(); ++i)
+        {
+            TextBlock item = items.valueAt(i);
+        }
+    }*/
 
     @Override
     public void release() {
