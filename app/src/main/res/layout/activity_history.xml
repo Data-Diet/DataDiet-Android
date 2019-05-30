@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HistoryActivity"
-    android:background="@drawable/history_background">
+    android:background="@drawable/history_background"
+    android:id="@+id/historyLayout">
 
     <TextView
         android:id="@+id/history_header"

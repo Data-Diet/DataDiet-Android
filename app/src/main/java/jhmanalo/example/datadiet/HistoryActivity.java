@@ -16,6 +16,8 @@ import android.view.MotionEvent;
 import android.util.Log;
 import android.widget.TextView;
 import android.content.Intent;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -27,12 +29,15 @@ public class HistoryActivity extends AppCompatActivity {
     View listItemSwiped;
     GestureDetector gestureDetector;
     ImageButton delete;
+    ConstraintLayout historyLayout;
+    String productDeleted, prodDelURL, prodDelIngred;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
+        historyLayout = findViewById(R.id.historyLayout);
         listView = findViewById(R.id.list_view);
         productDB = new ProductDbHelper(this);
         cursor = productDB.getAllProducts();
@@ -178,10 +183,24 @@ public class HistoryActivity extends AppCompatActivity {
             delete.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     TextView product = listItemSwiped.findViewById(R.id.productName);
-                    String productName = product.getText().toString();
-                    productDB.deleteName(productName);
+                    productDeleted = product.getText().toString();
+                    prodDelURL = getProductURL(productDeleted);
+                    prodDelIngred = getProductIngredients(productDeleted);
+                    productDB.deleteName(productDeleted);
                     adapter.clear();
                     displayProductList();
+                    Snackbar snackbar = Snackbar.make(historyLayout, "Product deleted", Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    productDB.insert(productDeleted, prodDelURL, prodDelIngred);
+                                    adapter.clear();
+                                    displayProductList();
+                                    Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);
+                                    undoSnackbar.show();
+                                }
+                            });
+                    snackbar.show();
                 }
             });
         }
