@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -59,9 +61,10 @@ import java.net.URL;
 import java.util.List;
 
 import dmax.dialog.SpotsDialog;
+import jhmanalo.example.datadiet.camera.GraphicOverlay;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener{
 
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGetReference;
@@ -76,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
     Button btnImageGallery;
     Button btnHistory;
     AlertDialog waitingDialog;
+    ImageView imageView;
+
+
+    private GestureDetector mGestureDetector;
 
 
     public final static int PICK_PHOTO_CODE = 1046;
@@ -124,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
         btnImageGallery = findViewById(R.id.btnimagegallery);
         btnSettings = findViewById(R.id.btnsettings);
         btnHistory = findViewById(R.id.btnhistory);
+        imageView = findViewById(R.id.imageView);
+        imageView.setOnTouchListener(this);
+
+
+        mGestureDetector = new GestureDetector(this,this);
 
 
         waitingDialog = new SpotsDialog.Builder()
@@ -267,5 +279,48 @@ public class MainActivity extends AppCompatActivity {
         cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        mGestureDetector.onTouchEvent(event);
+        return true;
+    }
+
+    //below are methods for GestureDetector.OnGestureListener functions
+    @Override
+    public boolean onDown(MotionEvent e) {
+        Log.d("onDown", "called");
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+        Log.d("onShowPress", "called");
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        Log.d("onSingleTapUp", "called");
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        Log.d("onScroll", "called");
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        Log.d("onLongPress", "called");
+        Intent intent = new Intent(this, OcrCaptureActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        Log.d("onFling", "called");
+        return false;
+    }
 
 }

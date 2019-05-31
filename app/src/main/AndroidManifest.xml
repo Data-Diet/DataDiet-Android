@@ -23,6 +23,7 @@
         <activity android:name=".HistoryActivity"/>
         <activity android:name=".SettingsActivity"/>
         <activity android:name=".ProductActivity"/>
+        <activity android:name=".OcrCaptureActivity"/>
 
         <activity
             android:name=".MainActivity"

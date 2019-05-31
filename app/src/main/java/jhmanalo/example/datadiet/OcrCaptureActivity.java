@@ -30,6 +30,7 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -85,6 +88,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     // A TextToSpeech engine for speaking a String value.
     private TextToSpeech tts;
     //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
+    Button settings;
+    Button history;
+    Button cameraButton;
+    Button gallery;
+    ImageView imageView;
 
     /**
      * Initializes the UI and creates the detector pipeline.
@@ -113,9 +121,10 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Snackbar.make(graphicOverlay, "Tap to Speak. Pinch/Stretch to zoom",
+        Snackbar.make(graphicOverlay, "Hold text to camera to scan",
                 Snackbar.LENGTH_LONG)
                 .show();
+
 
         // TODO: Set up the Text To Speech engine.
         TextToSpeech.OnInitListener listener =
@@ -131,6 +140,33 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                     }
                 };
         tts = new TextToSpeech(this.getApplicationContext(), listener);
+        settings = findViewById(R.id.btnsettings);
+        history = findViewById(R.id.btnhistory);
+        cameraButton = findViewById(R.id.btndetect);
+        gallery = findViewById(R.id.btnimagegallery);
+        imageView = findViewById(R.id.imageView);
+
+        settings.setEnabled(false);
+        history.setEnabled(false);
+        cameraButton.setEnabled(false);
+        gallery.setEnabled(false);
+
+        ConstraintLayout layout = findViewById(R.id.ConstraintLayout);
+        Button back = new Button(this);
+        back.setLayoutParams(new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT));
+        back.setText("Back");
+        back.setOnClickListener(new Button.OnClickListener()
+                                {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent;
+                                        intent = new Intent(v.getContext(), MainActivity.class);
+                                        startActivity(intent);
+                                        // put code on click operation
+                                    }
+                                });
+        layout.addView(back);
+        //imageView.setEnabled(false);
     }
 
     /**
@@ -360,6 +396,8 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         public boolean onSingleTapConfirmed(MotionEvent e) {
             return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
         }
+
+
     }
 
     private class ScaleListener implements ScaleGestureDetector.OnScaleGestureListener {
