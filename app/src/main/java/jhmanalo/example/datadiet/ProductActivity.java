@@ -110,13 +110,13 @@ public class ProductActivity extends AppCompatActivity {
                 if (allergiesSet.contains(ingredient)) {
                     Log.d("allergy check", "found: " + ingredient);
                     if (!allergensFound.contains(ingredient))
-                        allergensFound += ingredient + ", ";
+                        allergensFound += ingredient + ", \n";
 
                 }
                 Log.d("allergy check", ingredient);
             }
         }
-        return "Allergens found from your preferences: " + allergensFound.substring(0, allergensFound.length() - 2);
+        return "Allergens found from your preferences: \n" + allergensFound.substring(0, allergensFound.length() - 2);
     }
 
     public void displayProduct (JSONObject obj){
@@ -129,6 +129,14 @@ public class ProductActivity extends AppCompatActivity {
             Log.e("Proudct", "error retrieving JSON Product");
 
         }
+
+        linearLayout = findViewById(R.id.itemLayout);
+        scrollView = findViewById(R.id.itemScrollLayout);
+        ImageView productPicture = findViewById(R.id.productPic);
+        TextView productTitleView = findViewById(R.id.productTitle);
+        TextView warningTag = findViewById(R.id.warningTag);
+        expandableListView = findViewById(R.id.productItemList);
+
         String imageURL = null;
         String productBrand = null;
         String productTitle = null;
@@ -140,17 +148,60 @@ public class ProductActivity extends AppCompatActivity {
         int ingredientsLen = 0;
 
         try {
-            imageURL = product.get("image_front_url").toString();
             productBrand = product.get("brands").toString();
             productTitle = productBrand + " " +
                     product.get("product_name").toString();
+
+            final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
+            final StyleSpan iss = new StyleSpan(Typeface.ITALIC); //Span to make text italic
+
+            SpannableString productTitleText = new SpannableString(productTitle);
+            productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
+
+            ProductDb.deleteURL(ProductURL);
+            ProductDb.insert(productTitle, ProductURL, "TBD");
+
+            productTitleView.setText(productTitleText);
+
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving JSON title data");
+            Toast.makeText(context, "Sorry, product was not found", Toast.LENGTH_LONG).show();
+            ProductDb.deleteURL(ProductURL);
+            Intent intent = new Intent(context, MainActivity.class);
+            startActivity(intent);
+        }
+
+        try {
+            imageURL = product.get("image_front_url").toString();
+
+            Picasso.get()
+                    .load(imageURL)
+                    .resize(1000,1000)
+                    .centerCrop()
+                    .into(productPicture);
+
+        } catch (Exception e) {
+            Log.e("Display Data", "error retrieving JSON image data");
+        }
+
+        try {
+            warningTag.setText(allergenCheck(product.getString("ingredients_text")));
+        } catch (Exception e) {
+            Log.d("allergen check", "error parsing ingredients Text JSON");
         }
 
         try {
             JSONlabelArray = product.getJSONArray("labels_hierarchy");
             labelsLen = JSONlabelArray.length();
+
+            ArrayList<String> labelsList = new ArrayList<>();
+
+            makeDropdownList(JSONlabelArray, labelsLen, labelsList, "labels");
+
+            if (!labelsList.isEmpty())
+                expandableListDetail.put("Labels", labelsList);
+
+
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving labels JSON data");
         }
@@ -164,55 +215,21 @@ public class ProductActivity extends AppCompatActivity {
 
         try{
             allergenCheck(product.getString("ingredients_text"));
+
+            ArrayList<String> ingredientsList = new ArrayList<>();
+
+            makeDropdownList(JSONIngrArray, ingredientsLen, ingredientsList, "ingredients");
+
+            if (!ingredientsList.isEmpty())
+                expandableListDetail.put("Ingredients", ingredientsList);
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving allergen check");
 
         }
 
-        final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
-        final StyleSpan iss = new StyleSpan(Typeface.ITALIC); //Span to make text italic
 
-        SpannableString productTitleText = new SpannableString(productTitle);
-        productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
-
-        linearLayout = findViewById(R.id.itemLayout);
-        scrollView = findViewById(R.id.itemScrollLayout);
-        ImageView productPicture = findViewById(R.id.productPic);
-        TextView productTitleView = findViewById(R.id.productTitle);
-        TextView warningTag = findViewById(R.id.warningTag);
-        expandableListView = findViewById(R.id.productItemList);
-
-
-        Log.d("JSON URL", ProductURL);
-        Log.d("product ingredients", String.valueOf(ingredientsLen));
-
-
-        ProductDb.deleteURL(ProductURL);
-        ProductDb.insert(productTitle, ProductURL, "TBD");
-
-        productTitleView.setText(productTitleText);
-
-        Picasso.get()
-                .load(imageURL)
-                .resize(1000,1000)
-                .centerCrop()
-                .into(productPicture);
-        try {
-            warningTag.setText(allergenCheck(product.getString("ingredients_text")));
-        } catch (Exception e) {
-            Log.d("allergen check", "error parsing ingredients Text JSON");
-        }
-
-        ArrayList<String> labelsList = new ArrayList<>();
-        ArrayList<String> ingredientsList = new ArrayList<>();
-
-        makeDropdownList(JSONlabelArray, labelsLen, labelsList, "labels");
-        makeDropdownList(JSONIngrArray, ingredientsLen, ingredientsList, "ingredients");
-
-        if (!ingredientsList.isEmpty())
-            expandableListDetail.put("Ingredients", ingredientsList);
-        if (!labelsList.isEmpty())
-            expandableListDetail.put("Labels", labelsList);
+//        Log.d("JSON URL", ProductURL);
+//        Log.d("product ingredients", String.valueOf(ingredientsLen));
 
         expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
 
@@ -314,10 +331,12 @@ public class ProductActivity extends AppCompatActivity {
             try {
                 obj = new JSONObject(result);
                 if (Integer.parseInt(obj.getString("status")) == 0) {
-                    Toast.makeText(context, "Sorry, product was not found1", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Sorry, product was not found", Toast.LENGTH_LONG).show();
                     ProductDb.deleteURL(ProductURL);
                     Intent intent = new Intent(context, MainActivity.class);
                     startActivity(intent);
+                } else {
+                    displayProduct(obj);
                 }
 
             } catch (Throwable t) {
@@ -327,7 +346,6 @@ public class ProductActivity extends AppCompatActivity {
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
             }
-            displayProduct(obj);
 
         }
     }

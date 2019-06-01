@@ -56,6 +56,11 @@
                 android:textColor="@android:color/holo_red_light" />
 
 
+            <SearchView
+                android:id="@+id/ingredientSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="10000dp">
