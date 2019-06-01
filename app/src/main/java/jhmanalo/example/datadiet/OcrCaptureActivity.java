@@ -87,7 +87,11 @@ public final class OcrCaptureActivity extends AppCompatActivity {
 
     // A TextToSpeech engine for speaking a String value.
     private TextToSpeech tts;
-    //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
+    public static SharedPreferences sp;
+    public static Boolean allergiesChecked;
+    public static String allergies;
+    public static String[] allergyList;
+
     Button settings;
     Button history;
     Button cameraButton;
@@ -101,6 +105,17 @@ public final class OcrCaptureActivity extends AppCompatActivity {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.activity_main);
+        sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
+        allergiesChecked = sp.getBoolean("allergiesChecked", false);
+        Log.d("ocrActivity on create", "allergiesChecked is " + allergiesChecked);
+        allergies = sp.getString("allergylist", "");
+        Log.d("ocrActivity on create", "allergies is " + allergies);
+        allergyList = allergies.split(",");
+        for (int i = 0; i < allergyList.length; i++)
+        {
+            Log.d("ocrActivity on create", "allergyList is " + allergyList[i]);
+        }
+
 
         preview = (CameraSourcePreview) findViewById(R.id.preview);
         graphicOverlay = (GraphicOverlay<OcrGraphic>) findViewById(R.id.graphicOverlay);
