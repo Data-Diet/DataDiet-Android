@@ -16,9 +16,8 @@
     <ScrollView
         android:id="@+id/itemScrollLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:padding="15dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,8 +29,9 @@
             android:id="@+id/itemLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:padding="5dp"
+            android:orientation="vertical"
+            android:layout_margin="10dp"
             android:background="@color/white">
 
             <TextView
@@ -47,13 +47,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <ExpandableListView
-                android:id="@+id/productItemList"
-                android:layout_height="300dp"
+            <TextView
+                android:id="@+id/warningTag"
                 android:layout_width="match_parent"
-                android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
-                android:divider="@android:color/darker_gray"
-                android:dividerHeight="0.5dp" />
+                android:layout_height="wrap_content"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_red_light" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="10000dp">
+
+                <ExpandableListView
+                    android:id="@+id/productItemList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="0.5dp"
+                    android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

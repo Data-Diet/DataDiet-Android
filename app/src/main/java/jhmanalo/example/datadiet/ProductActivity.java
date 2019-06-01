@@ -15,10 +15,12 @@ import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,8 +83,8 @@ public class ProductActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public List<String> allergenCheck(String ingredients) {
-        ArrayList<String> allergensFound = new ArrayList<String>();
+    public String allergenCheck(String ingredients) {
+        String allergensFound = "";
         SharedPreferences preferences = this.getSharedPreferences(
                 "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
         Boolean allergiesChecked = preferences.getBoolean("allergiesChecked", false);
@@ -107,16 +109,26 @@ public class ProductActivity extends AppCompatActivity {
                 String ingredient = ingredientList.nextToken().toLowerCase();
                 if (allergiesSet.contains(ingredient)) {
                     Log.d("allergy check", "found: " + ingredient);
-                    allergensFound.add(ingredient);
+                    if (!allergensFound.contains(ingredient))
+                        allergensFound += ingredient + ", ";
 
                 }
                 Log.d("allergy check", ingredient);
             }
         }
-        return allergensFound;
+        return "Allergens found from your preferences: " + allergensFound.substring(0, allergensFound.length() - 2);
     }
 
     public void displayProduct (JSONObject obj){
+
+        JSONObject product = null;
+
+        try {
+            product = obj.getJSONObject("product");
+        } catch (Exception e) {
+            Log.e("Proudct", "error retrieving JSON Product");
+
+        }
         String imageURL = null;
         String productBrand = null;
         String productTitle = null;
@@ -128,30 +140,30 @@ public class ProductActivity extends AppCompatActivity {
         int ingredientsLen = 0;
 
         try {
-            imageURL = obj.getJSONObject("product").get("image_front_url").toString();
-            productBrand = obj.getJSONObject("product").get("brands").toString();
+            imageURL = product.get("image_front_url").toString();
+            productBrand = product.get("brands").toString();
             productTitle = productBrand + " " +
-                    obj.getJSONObject("product").get("product_name").toString();
+                    product.get("product_name").toString();
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving JSON title data");
         }
 
         try {
-            JSONlabelArray = obj.getJSONObject("product").getJSONArray("labels_hierarchy");
+            JSONlabelArray = product.getJSONArray("labels_hierarchy");
             labelsLen = JSONlabelArray.length();
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving labels JSON data");
         }
 
         try {
-            JSONIngrArray = obj.getJSONObject("product").getJSONArray("ingredients_tags");
+            JSONIngrArray = product.getJSONArray("ingredients_tags");
             ingredientsLen = JSONIngrArray.length();
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving ingredients JSON data");
         }
 
         try{
-            allergenCheck(obj.getJSONObject("product").getString("ingredients_text"));
+            allergenCheck(product.getString("ingredients_text"));
         } catch (Exception e) {
             Log.e("Display Data", "error retrieving allergen check");
 
@@ -167,6 +179,7 @@ public class ProductActivity extends AppCompatActivity {
         scrollView = findViewById(R.id.itemScrollLayout);
         ImageView productPicture = findViewById(R.id.productPic);
         TextView productTitleView = findViewById(R.id.productTitle);
+        TextView warningTag = findViewById(R.id.warningTag);
         expandableListView = findViewById(R.id.productItemList);
 
 
@@ -184,6 +197,11 @@ public class ProductActivity extends AppCompatActivity {
                 .resize(1000,1000)
                 .centerCrop()
                 .into(productPicture);
+        try {
+            warningTag.setText(allergenCheck(product.getString("ingredients_text")));
+        } catch (Exception e) {
+            Log.d("allergen check", "error parsing ingredients Text JSON");
+        }
 
         ArrayList<String> labelsList = new ArrayList<>();
         ArrayList<String> ingredientsList = new ArrayList<>();
@@ -201,8 +219,12 @@ public class ProductActivity extends AppCompatActivity {
         if (expandableListDetail != null)
             expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
 
-        if (expandableListAdapter != null)
-        expandableListView.setAdapter(expandableListAdapter);
+        if (expandableListAdapter != null) {
+            expandableListView.setAdapter(expandableListAdapter);
+            //Utility.setListViewHeightBasedOnChildren(expandableListView);
+
+        }
+
 
         Log.d("My App", obj.toString());
     }
