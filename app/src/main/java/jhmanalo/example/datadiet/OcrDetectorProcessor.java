@@ -48,6 +48,7 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
     Boolean allergiesChecked = false;
     String allergies;
     String[] allergyList;
+    //public SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
 
     /*@Override
     protected void onCreate(Bundle savedInstanceState)
@@ -68,7 +69,10 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
     // TODO:  Once this implements Detector.Processor<TextBlock>, implement the abstract methods.
     @Override
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
-        //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", this.MODE_PRIVATE);
+        //SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
+        allergiesChecked = OcrCaptureActivity.allergiesChecked;
+        allergyList = OcrCaptureActivity.allergyList;
+
         graphicOverlay.clear();
         SparseArray<TextBlock> items = detections.getDetectedItems();
         for (int i = 0; i < items.size(); ++i) {
@@ -79,16 +83,20 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                 graphicOverlay.add(graphic);
 
                 if (allergiesChecked) {
-                    for (String str : allergyList) {
-                        str.trim();
-                    }
                     for (String s : allergyList) {
+
                         String[] tokens = item.getValue().split(" ");
                         for (String t : tokens) {
-                            Log.d("processor", "value of s: " + s);
-                            Log.d("processor", "value of t: " + t);
-                            if (s.toLowerCase().equals(t.toLowerCase())) {
-                                Log.d("processor", "shared preference detected: " + s);
+                            String fromSharedPref = s.toLowerCase();
+                            fromSharedPref = fromSharedPref.trim();
+
+                            String scannedItem = t.toLowerCase();
+                            scannedItem = scannedItem.replace("\n", " ");
+                            scannedItem = scannedItem.trim();
+                            Log.d("processor", "value of s: " + fromSharedPref);
+                            Log.d("processor", "value of t: " + scannedItem);
+                            if (fromSharedPref.equals(scannedItem)) {
+                                Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
                             }
                         }
                     }
