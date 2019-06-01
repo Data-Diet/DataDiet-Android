@@ -96,7 +96,7 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                             Log.d("processor", "value of s: " + fromSharedPref);
                             Log.d("processor", "value of t: " + scannedItem);
                             if (fromSharedPref.equals(scannedItem)) {
-                                Log.d("processor", "shared preference detected: " + scannedItem);
+                                Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
                             }
                         }
                     }
