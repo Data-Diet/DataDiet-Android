@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     Context context;
 
-    private CameraKitView cameraView;
+    private CameraView cameraView;
     Button btnDetect;
     Button btnSettings;
     Button btnImageGallery;
@@ -88,27 +88,15 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     public final static int PICK_PHOTO_CODE = 1046;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        cameraView.onStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-        cameraView.onResume();
+        cameraView.start();
     }
 
     @Override
     protected void onPause() {
-        cameraView.onPause();
+        cameraView.stop();
         super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        cameraView.onStop();
-        super.onStop();
     }
 
     @Override
@@ -147,19 +135,38 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         btnDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cameraView.captureImage(new  CameraKitView.ImageCallback() {
-                    @Override
-                    public void onImage(CameraKitView cameraKitView, final byte[] capturedImage) {
-                        waitingDialog.show();
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(capturedImage, 0, capturedImage.length);
-                        bitmap = Bitmap.createScaledBitmap(bitmap, cameraView.getWidth(), cameraView.getHeight(), false);
+                cameraView.start();
+                cameraView.captureImage();
+            }
+        });
 
-                        runDetector(bitmap);
-                    }
-                });
+        cameraView.addCameraKitListener(new CameraKitEventListener() {
+            @Override
+            public void onEvent(CameraKitEvent cameraKitEvent) {
+
+            }
+
+            @Override
+            public void onError(CameraKitError cameraKitError) {
+
+            }
+
+            @Override
+            public void onImage(CameraKitImage cameraKitImage) {
+                waitingDialog.show();
+                Bitmap bitmap = cameraKitImage.getBitmap();
+                bitmap = Bitmap.createScaledBitmap(bitmap, cameraView.getWidth(), cameraView.getHeight(), false);
+
+                runDetector(bitmap);
+            }
+
+            @Override
+            public void onVideo(CameraKitVideo cameraKitVideo) {
+
             }
         });
     }
+
 
     private void runDetector(Bitmap bitmap) {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
@@ -271,12 +278,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             }
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
 
