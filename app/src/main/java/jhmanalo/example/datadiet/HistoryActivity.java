@@ -178,31 +178,33 @@ public class HistoryActivity extends AppCompatActivity {
         private void showDeleteButton(MotionEvent motionEvent) {
             int swipeIndex = getIndexOfGesture(motionEvent);
             listItemSwiped = listView.getChildAt(swipeIndex);
-            delete = listItemSwiped.findViewById(R.id.deleteButton);
-            delete.setVisibility(View.VISIBLE);
-            delete.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    TextView product = listItemSwiped.findViewById(R.id.productName);
-                    productDeleted = product.getText().toString();
-                    prodDelURL = getProductURL(productDeleted);
-                    prodDelIngred = getProductIngredients(productDeleted);
-                    productDB.deleteName(productDeleted);
-                    adapter.clear();
-                    displayProductList();
-                    Snackbar snackbar = Snackbar.make(historyLayout, "Product deleted", Snackbar.LENGTH_LONG)
-                            .setAction("UNDO", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    productDB.insert(productDeleted, prodDelURL, prodDelIngred);
-                                    adapter.clear();
-                                    displayProductList();
-                                    Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);
-                                    undoSnackbar.show();
-                                }
-                            });
-                    snackbar.show();
-                }
-            });
+            if (listItemSwiped != null) {
+                delete = listItemSwiped.findViewById(R.id.deleteButton);
+                delete.setVisibility(View.VISIBLE);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        TextView product = listItemSwiped.findViewById(R.id.productName);
+                        productDeleted = product.getText().toString();
+                        prodDelURL = getProductURL(productDeleted);
+                        prodDelIngred = getProductIngredients(productDeleted);
+                        productDB.deleteName(productDeleted);
+                        adapter.clear();
+                        displayProductList();
+                        Snackbar snackbar = Snackbar.make(historyLayout, "Product deleted", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        productDB.insert(productDeleted, prodDelURL, prodDelIngred);
+                                        adapter.clear();
+                                        displayProductList();
+                                        Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);
+                                        undoSnackbar.show();
+                                    }
+                                });
+                        snackbar.show();
+                    }
+                });
+            }
         }
     }
 }
