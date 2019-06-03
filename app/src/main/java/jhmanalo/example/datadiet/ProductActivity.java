@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,19 @@ public class ProductActivity extends AppCompatActivity {
 
     LinearLayout linearLayout;
     ScrollView scrollView;
+
+    SearchView searchBar;
+
+    JSONObject product;
+
+    JSONArray JSONlabelArray = null;
+    JSONArray JSONIngrArray = null;
+
+    int labelsLen = 0;
+    int ingredientsLen = 0;
+
+    ArrayList<String> ingredientsList;
+    ArrayList<String> labelsList;
 
     ExpandableListView expandableListView;
     ExpandableListAdapter expandableListAdapter;
@@ -116,12 +130,16 @@ public class ProductActivity extends AppCompatActivity {
                 Log.d("allergy check", ingredient);
             }
         }
-        return "Allergens found from your preferences: \n" + allergensFound.substring(0, allergensFound.length() - 2);
+
+        if (allergensFound.isEmpty())
+            return "";
+        else
+            return "Allergens found from your preferences: \n" + allergensFound.substring(0, allergensFound.length() - 3);
     }
 
     public void displayProduct (JSONObject obj){
 
-        JSONObject product = null;
+        product = null;
 
         try {
             product = obj.getJSONObject("product");
@@ -130,6 +148,7 @@ public class ProductActivity extends AppCompatActivity {
 
         }
 
+        searchBar = findViewById(R.id.ingredientSearch);
         linearLayout = findViewById(R.id.itemLayout);
         scrollView = findViewById(R.id.itemScrollLayout);
         ImageView productPicture = findViewById(R.id.productPic);
@@ -140,12 +159,6 @@ public class ProductActivity extends AppCompatActivity {
         String imageURL = null;
         String productBrand = null;
         String productTitle = null;
-
-        JSONArray JSONlabelArray = null;
-        JSONArray JSONIngrArray = null;
-
-        int labelsLen = 0;
-        int ingredientsLen = 0;
 
         try {
             productBrand = product.get("brands").toString();
@@ -194,7 +207,7 @@ public class ProductActivity extends AppCompatActivity {
             JSONlabelArray = product.getJSONArray("labels_hierarchy");
             labelsLen = JSONlabelArray.length();
 
-            ArrayList<String> labelsList = new ArrayList<>();
+            labelsList = new ArrayList<>();
 
             makeDropdownList(JSONlabelArray, labelsLen, labelsList, "labels");
 
@@ -214,9 +227,7 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         try{
-            allergenCheck(product.getString("ingredients_text"));
-
-            ArrayList<String> ingredientsList = new ArrayList<>();
+            ingredientsList = new ArrayList<>();
 
             makeDropdownList(JSONIngrArray, ingredientsLen, ingredientsList, "ingredients");
 
@@ -226,6 +237,23 @@ public class ProductActivity extends AppCompatActivity {
             Log.e("Display Data", "error retrieving allergen check");
 
         }
+
+        if (JSONIngrArray == null && JSONlabelArray == null)
+            searchBar.setVisibility(View.INVISIBLE);
+
+        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                                               @Override
+                                               public boolean onQueryTextChange(String newText) {
+                                                   searchItems(newText, product);
+                                                   return true;
+                                               }
+
+                                               @Override
+                                               public boolean onQueryTextSubmit(String query) {
+                                                   searchItems(query, product);
+                                                   return true;
+                                               }
+                                           });
 
 
 //        Log.d("JSON URL", ProductURL);
@@ -246,6 +274,66 @@ public class ProductActivity extends AppCompatActivity {
         Log.d("My App", obj.toString());
     }
 
+    public void searchItems(String query, JSONObject product) {
+        if (query.isEmpty()) {
+            if (ingredientsList != null) {
+                expandableListDetail.remove("Ingredients");
+                expandableListDetail.put("Ingredients", ingredientsList);
+
+                expandableListView.collapseGroup(0);
+                expandableListView.expandGroup(0, true);
+            }
+            if (labelsList != null) {
+                expandableListDetail.remove("Labels");
+                expandableListDetail.put("Labels", labelsList);
+
+                if (ingredientsList == null) {
+                    expandableListView.collapseGroup(0);
+                    expandableListView.expandGroup(0, true);
+                }
+                else {
+                    expandableListView.collapseGroup(1);
+                    expandableListView.expandGroup(1, true);
+                }
+            }
+
+        } else {
+            ArrayList<String> SearchedIngredientsList = new ArrayList();
+            ArrayList<String> SearchedLabelsList = new ArrayList();
+            if (ingredientsList != null) {
+                for (String ingredient : ingredientsList) {
+                    if (ingredient.contains(query)) {
+                        SearchedIngredientsList.add(ingredient);
+                    }
+                }
+                expandableListDetail.remove("Ingredients");
+                expandableListDetail.put("Ingredients", SearchedIngredientsList);
+                expandableListView.collapseGroup(0);
+                expandableListView.expandGroup(0, true);
+            }
+
+            if (labelsList != null) {
+                for (String label : labelsList) {
+                    if (label.contains(query)) {
+                        SearchedLabelsList.add(label);
+                    }
+                }
+                expandableListDetail.remove("Labels");
+                expandableListDetail.put("Labels", SearchedLabelsList);
+                if (ingredientsList == null) {
+                    expandableListView.collapseGroup(0);
+                    expandableListView.expandGroup(0, true);
+                }
+                else {
+                    expandableListView.collapseGroup(1);
+                    expandableListView.expandGroup(1, true);
+                }
+
+
+            }
+        }
+    }
+
     public void makeDropdownList(JSONArray JArray, int JArrayLen, ArrayList<String> List, String listType) {
         if (JArray != null) {
             int i = 0;
@@ -254,7 +342,7 @@ public class ProductActivity extends AppCompatActivity {
                     List.add(JArray.get(i).toString().substring(3));
 
                 } catch (Exception e) {
-                    Log.d("product " + listType, "could not parse element " + i + " from ingredients");
+                    Log.d("product " + listType, "could not parse element " + i + " from " + listType);
                 }
                 i++;
             }
