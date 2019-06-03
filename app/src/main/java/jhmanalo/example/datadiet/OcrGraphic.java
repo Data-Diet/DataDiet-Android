@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 
 //import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.text.TextBlock;
@@ -47,7 +48,6 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         if (rectPaint == null) {
             rectPaint = new Paint();
             rectPaint.setColor(TEXT_COLOR);
-            
             rectPaint.setStyle(Paint.Style.STROKE);
             rectPaint.setStrokeWidth(4.0f);
         }
@@ -58,17 +58,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
             textPaint.setTextSize(54.0f);
         }
 
-        if (OcrDetectorProcessor.makeRed)
-        {
-            rectPaint = new Paint();
-            rectPaint.setColor(Color.RED);
-            rectPaint.setStyle(Paint.Style.STROKE);
-            rectPaint.setStrokeWidth(4.0f);
-            textPaint = new Paint();
-            textPaint.setColor(Color.RED);
-            textPaint.setTextSize(54.0f);
 
-        }
         // Redraw the overlay, as this graphic has been added.
         postInvalidate();
     }
@@ -115,6 +105,33 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         // Draws the bounding box around the TextBlock.
         RectF rect = new RectF(text.getBoundingBox());
         rect = translateRect(rect);
+        Log.d("OcrGraphic", "text.getValue is " + text.getValue());
+        String[] arr = text.getValue().split(" ");
+
+        if (OcrDetectorProcessor.makeRed)
+        {
+            for (String s : arr)
+            {
+                String cleanS = s.trim();
+                cleanS = cleanS.toLowerCase();
+
+                Log.d("OcrGraphic", "s is " + cleanS);
+                Log.d("OcrGraphic", "scanned is " + OcrDetectorProcessor.scanned);
+                if (cleanS.equals(OcrDetectorProcessor.scanned))
+                {
+                    rectPaint.setColor(Color.RED);
+                    textPaint.setColor(Color.RED);
+                    Log.d("OcrGraphic", "paint it red");
+                }
+                else
+                {
+                    rectPaint.setColor(Color.WHITE);
+                    textPaint.setColor(Color.WHITE);
+                }
+            }
+
+        }
+
         canvas.drawRect(rect, rectPaint);
 
         // Render the text at the bottom of the box.

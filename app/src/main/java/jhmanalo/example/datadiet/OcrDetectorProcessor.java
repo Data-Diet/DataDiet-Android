@@ -48,7 +48,8 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
     Boolean allergiesChecked = false;
     String allergies;
     String[] allergyList;
-    public static boolean makeRed = false;
+    public static boolean makeRed;
+    public static String scanned;
     //public SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
 
     /*@Override
@@ -81,7 +82,7 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
             if (item != null && item.getValue() != null) {
                 Log.d("Processor", "Text detected! " + item.getValue());
                 OcrGraphic graphic = new OcrGraphic(graphicOverlay, item);
-                graphicOverlay.add(graphic);
+                graphicOverlay.add(graphic); //LOOK AT THIS
 
                 if (allergiesChecked) {
                     for (String s : allergyList) {
@@ -98,11 +99,12 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                             Log.d("processor", "value of t: " + scannedItem);
                             if (fromSharedPref.equals(scannedItem)) {
                                 Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
+                                scanned = scannedItem;
                                 makeRed = true;
                             }
                             else
                             {
-                                makeRed = false;
+                                //makeRed = false;
                             }
                         }
                     }
