@@ -47,6 +47,10 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         if (rectPaint == null) {
             rectPaint = new Paint();
             rectPaint.setColor(TEXT_COLOR);
+            if (OcrDetectorProcessor.makeRed)
+            {
+                rectPaint.setColor(Color.RED);
+            }
             rectPaint.setStyle(Paint.Style.STROKE);
             rectPaint.setStrokeWidth(4.0f);
         }
