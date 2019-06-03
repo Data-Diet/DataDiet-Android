@@ -148,7 +148,7 @@ public class ProductActivity extends AppCompatActivity {
         try {
             product = obj.getJSONObject("product");
         } catch (Exception e) {
-            Log.e("Proudct", "error retrieving JSON Product");
+            Log.e("Product", "error retrieving JSON Product");
 
         }
 
@@ -176,7 +176,7 @@ public class ProductActivity extends AppCompatActivity {
             productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
 
             ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(productTitle, ProductURL, "TBD");
+            ProductDb.insert(productTitle, product.get("product_name").toString(), "TBD");
 
             productTitleView.setText(productTitleText);
 
@@ -205,6 +205,9 @@ public class ProductActivity extends AppCompatActivity {
             String warningText = allergenCheck(product.getString("ingredients_text"));
             if (!warningText.equals(""))
                 warningTag.setText(warningText);
+
+            ProductDb.deleteURL(ProductURL);
+            ProductDb.insert(productTitle, product.get("product_name").toString(), warningText.substring(40));
         } catch (Exception e) {
             Log.d("allergen check", "error parsing ingredients Text JSON");
         }
