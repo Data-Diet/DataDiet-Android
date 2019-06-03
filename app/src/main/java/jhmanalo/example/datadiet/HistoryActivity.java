@@ -30,7 +30,7 @@ public class HistoryActivity extends AppCompatActivity {
     GestureDetector gestureDetector;
     ImageButton delete;
     ConstraintLayout historyLayout;
-    String productDeleted, prodDelURL, prodDelIngred;
+    String productDeleted, prodDelURL, prodDelWarn;
 
 
     @Override
@@ -186,7 +186,7 @@ public class HistoryActivity extends AppCompatActivity {
                         TextView product = listItemSwiped.findViewById(R.id.productName);
                         productDeleted = product.getText().toString();
                         prodDelURL = getProductURL(productDeleted);
-                        prodDelIngred = getProductIngredients(productDeleted);
+                        prodDelWarn = getProductIngredients(productDeleted);
                         productDB.deleteName(productDeleted);
                         adapter.clear();
                         displayProductList();
@@ -194,7 +194,7 @@ public class HistoryActivity extends AppCompatActivity {
                                 .setAction("UNDO", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        productDB.insert(productDeleted, prodDelURL, prodDelIngred);
+                                        productDB.insert(productDeleted, prodDelURL, prodDelWarn);
                                         adapter.clear();
                                         displayProductList();
                                         Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);

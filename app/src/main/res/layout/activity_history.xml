@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HistoryActivity"
-    android:background="@drawable/settings_background"
+    android:background="@drawable/food_background"
     android:id="@+id/historyLayout">
 
     <TextView
@@ -28,10 +28,10 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="100dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginTop="135dp"
-        android:layout_marginBottom="175dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="100dp"
         android:divider="@color/white"
         android:dividerHeight="1dp">
     </ListView>
