@@ -47,10 +47,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         if (rectPaint == null) {
             rectPaint = new Paint();
             rectPaint.setColor(TEXT_COLOR);
-            if (OcrDetectorProcessor.makeRed)
-            {
-                rectPaint.setColor(Color.RED);
-            }
+            
             rectPaint.setStyle(Paint.Style.STROKE);
             rectPaint.setStrokeWidth(4.0f);
         }
@@ -59,6 +56,18 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
             textPaint = new Paint();
             textPaint.setColor(TEXT_COLOR);
             textPaint.setTextSize(54.0f);
+        }
+
+        if (OcrDetectorProcessor.makeRed)
+        {
+            rectPaint = new Paint();
+            rectPaint.setColor(Color.RED);
+            rectPaint.setStyle(Paint.Style.STROKE);
+            rectPaint.setStrokeWidth(4.0f);
+            textPaint = new Paint();
+            textPaint.setColor(Color.RED);
+            textPaint.setTextSize(54.0f);
+
         }
         // Redraw the overlay, as this graphic has been added.
         postInvalidate();
