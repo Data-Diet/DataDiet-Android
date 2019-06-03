@@ -207,7 +207,7 @@ public class ProductActivity extends AppCompatActivity {
                 warningTag.setText(warningText);
 
             ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(productTitle, product.get("product_name").toString(), warningText.substring(40));
+            ProductDb.insert(ProductURL, product.get("product_name").toString(), warningText.substring(40));
         } catch (Exception e) {
             Log.d("allergen check", "error parsing ingredients Text JSON");
         }
