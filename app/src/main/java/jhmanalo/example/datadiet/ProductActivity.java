@@ -98,11 +98,11 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     public void resetScroll(View view) {
-        //scrollView();
+        scrollView.fullScroll(View.FOCUS_UP);
     }
 
-    public String allergenCheck(String ingredients) {
-        String allergensFound = "";
+    public String[] allergenCheck(String ingredients) {
+        HashSet<String> allergensFound = new HashSet<>();
         SharedPreferences preferences = this.getSharedPreferences(
                 "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
         Boolean allergiesChecked = preferences.getBoolean("allergiesChecked", false);
@@ -128,7 +128,7 @@ public class ProductActivity extends AppCompatActivity {
                 if (allergiesSet.contains(ingredient)) {
                     Log.d("allergy check", "found: " + ingredient);
                     if (!allergensFound.contains(ingredient))
-                        allergensFound += ingredient + ", \n";
+                        allergensFound.add(ingredient);
 
                 }
                 Log.d("allergy check", ingredient);
@@ -136,9 +136,9 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         if (allergensFound.isEmpty())
-            return "";
+            return new String[0];
         else
-            return allergensFound.substring(0, allergensFound.length() - 3);
+            return allergensFound.toArray(new String[allergensFound.size()]);
     }
 
     public void displayProduct (JSONObject obj){
@@ -202,13 +202,33 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         try {
-            String warningText = allergenCheck(product.getString("ingredients_text"));
-            if (!warningText.equals(""))
-                warningTag.setText("Allergens found from your preferences: \n" + warningText);
+            StringBuilder sbLine = new StringBuilder();
+            StringBuilder sbUnline = new StringBuilder();
 
-            ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(product.get("product_name").toString(), ProductURL, warningText);
+            String warningTextLine = "";
+            String warningTextUnline = "";
+            String[] allergensFound = allergenCheck(product.getString("ingredients_text"));
+
+            if (allergensFound.length == 0)
+                warningTag.setVisibility(View.GONE);
+            else {
+                for (String allergen: allergensFound) {
+                    sbLine.append(allergen);
+                    sbLine.append(", ");
+                    sbUnline.append(allergen);
+                    sbUnline.append(", \n");
+                }
+
+                warningTextLine = sbLine.toString().substring(2);
+                warningTextUnline = "Allergens found from your preferences: \n" + sbUnline.toString().substring(0, sbUnline.length() - 3);
+
+                warningTag.setText(warningTextUnline);
+                ProductDb.deleteURL(ProductURL);
+                ProductDb.insert(product.get("product_name").toString(), ProductURL, warningTextLine);
+            }
+
         } catch (Exception e) {
+            Log.e("allergen check", e.getLocalizedMessage());
             Log.d("allergen check", "error parsing ingredients Text JSON");
         }
 
@@ -284,6 +304,8 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     public void searchItems(String query, JSONObject product) {
+        String noResults = "no results found for: " + query;
+
         if (query.isEmpty()) {
             if (ingredientsList != null && !ingredientsList.isEmpty()) {
                 expandableListDetail.remove("Ingredients");
@@ -301,16 +323,19 @@ public class ProductActivity extends AppCompatActivity {
         } else {
             ArrayList<String> SearchedIngredientsList = new ArrayList();
             ArrayList<String> SearchedLabelsList = new ArrayList();
+
             if (ingredientsList != null && !ingredientsList.isEmpty()) {
                 for (String ingredient : ingredientsList) {
                     if (ingredient.contains(query)) {
                         SearchedIngredientsList.add(ingredient);
                     }
                 }
+
+                if (SearchedIngredientsList.isEmpty())
+                    SearchedIngredientsList.add(noResults);
+
                 expandableListDetail.remove("Ingredients");
                 expandableListDetail.put("Ingredients", SearchedIngredientsList);
-                expandableListView.collapseGroup(0);
-                expandableListView.expandGroup(0, true);
             }
 
             if (labelsList != null && !labelsList.isEmpty()) {
@@ -319,14 +344,17 @@ public class ProductActivity extends AppCompatActivity {
                         SearchedLabelsList.add(label);
                     }
                 }
+                if (SearchedLabelsList.isEmpty())
+                    SearchedLabelsList.add(noResults);
+
                 expandableListDetail.remove("Labels");
                 expandableListDetail.put("Labels", SearchedLabelsList);
             }
+        }
 
-            for (int i = 0; i < expandableListDetail.size(); i++) {
-                expandableListView.collapseGroup(i);
-                expandableListView.expandGroup(i, true);
-            }
+        for (int i = 0; i < expandableListDetail.size(); i++) {
+            expandableListView.collapseGroup(i);
+            expandableListView.expandGroup(i, true);
         }
     }
 
