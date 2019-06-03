@@ -138,7 +138,7 @@ public class ProductActivity extends AppCompatActivity {
         if (allergensFound.isEmpty())
             return "";
         else
-            return "Allergens found from your preferences: \n" + allergensFound.substring(0, allergensFound.length() - 3);
+            return allergensFound.substring(0, allergensFound.length() - 3);
     }
 
     public void displayProduct (JSONObject obj){
@@ -176,7 +176,7 @@ public class ProductActivity extends AppCompatActivity {
             productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
 
             ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(productTitle, product.get("product_name").toString(), "TBD");
+            ProductDb.insert(product.get("product_name").toString(), ProductURL, "TBD");
 
             productTitleView.setText(productTitleText);
 
@@ -204,10 +204,10 @@ public class ProductActivity extends AppCompatActivity {
         try {
             String warningText = allergenCheck(product.getString("ingredients_text"));
             if (!warningText.equals(""))
-                warningTag.setText(warningText);
+                warningTag.setText("Allergens found from your preferences: \n" + warningText);
 
             ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(ProductURL, product.get("product_name").toString(), warningText.substring(40));
+            ProductDb.insert(product.get("product_name").toString(), ProductURL, warningText);
         } catch (Exception e) {
             Log.d("allergen check", "error parsing ingredients Text JSON");
         }
