@@ -27,7 +27,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //CREATE TABLE NAME_TABLE (_id INTEGER PRIMARY KEY, FIRST_NAME STRING, LAST_NAME STRING);
         db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, PRODUCT_URL STRING, INGREDIENTS STRING);");
-        Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
+        //Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME + ";");
             VERSION = newVersion;
             onCreate(db);
-            Toast.makeText(ctx, "TABLE IS UPGRADED", Toast.LENGTH_LONG).show();
+            //Toast.makeText(ctx, "TABLE IS UPGRADED", Toast.LENGTH_LONG).show();
         }
 
     }
