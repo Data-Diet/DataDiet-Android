@@ -97,6 +97,10 @@ public class ProductActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void resetScroll(View view) {
+        //scrollView();
+    }
+
     public String allergenCheck(String ingredients) {
         String allergensFound = "";
         SharedPreferences preferences = this.getSharedPreferences(
@@ -162,7 +166,7 @@ public class ProductActivity extends AppCompatActivity {
 
         try {
             productBrand = product.get("brands").toString();
-            productTitle = productBrand + " " +
+            productTitle = productBrand + "\n" +
                     product.get("product_name").toString();
 
             final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
@@ -198,7 +202,9 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         try {
-            warningTag.setText(allergenCheck(product.getString("ingredients_text")));
+            String warningText = allergenCheck(product.getString("ingredients_text"));
+            if (!warningText.equals(""))
+                warningTag.setText(warningText);
         } catch (Exception e) {
             Log.d("allergen check", "error parsing ingredients Text JSON");
         }
@@ -276,31 +282,23 @@ public class ProductActivity extends AppCompatActivity {
 
     public void searchItems(String query, JSONObject product) {
         if (query.isEmpty()) {
-            if (ingredientsList != null) {
+            if (ingredientsList != null && !ingredientsList.isEmpty()) {
                 expandableListDetail.remove("Ingredients");
                 expandableListDetail.put("Ingredients", ingredientsList);
-
-                expandableListView.collapseGroup(0);
-                expandableListView.expandGroup(0, true);
             }
-            if (labelsList != null) {
+            if (labelsList != null && !labelsList.isEmpty()) {
                 expandableListDetail.remove("Labels");
                 expandableListDetail.put("Labels", labelsList);
-
-                if (ingredientsList == null) {
-                    expandableListView.collapseGroup(0);
-                    expandableListView.expandGroup(0, true);
-                }
-                else {
-                    expandableListView.collapseGroup(1);
-                    expandableListView.expandGroup(1, true);
-                }
+            }
+            for (int i = 0; i < expandableListDetail.size(); i++) {
+                expandableListView.collapseGroup(i);
+                expandableListView.expandGroup(i, true);
             }
 
         } else {
             ArrayList<String> SearchedIngredientsList = new ArrayList();
             ArrayList<String> SearchedLabelsList = new ArrayList();
-            if (ingredientsList != null) {
+            if (ingredientsList != null && !ingredientsList.isEmpty()) {
                 for (String ingredient : ingredientsList) {
                     if (ingredient.contains(query)) {
                         SearchedIngredientsList.add(ingredient);
@@ -312,7 +310,7 @@ public class ProductActivity extends AppCompatActivity {
                 expandableListView.expandGroup(0, true);
             }
 
-            if (labelsList != null) {
+            if (labelsList != null && !labelsList.isEmpty()) {
                 for (String label : labelsList) {
                     if (label.contains(query)) {
                         SearchedLabelsList.add(label);
@@ -320,16 +318,11 @@ public class ProductActivity extends AppCompatActivity {
                 }
                 expandableListDetail.remove("Labels");
                 expandableListDetail.put("Labels", SearchedLabelsList);
-                if (ingredientsList == null) {
-                    expandableListView.collapseGroup(0);
-                    expandableListView.expandGroup(0, true);
-                }
-                else {
-                    expandableListView.collapseGroup(1);
-                    expandableListView.expandGroup(1, true);
-                }
+            }
 
-
+            for (int i = 0; i < expandableListDetail.size(); i++) {
+                expandableListView.collapseGroup(i);
+                expandableListView.expandGroup(i, true);
             }
         }
     }
