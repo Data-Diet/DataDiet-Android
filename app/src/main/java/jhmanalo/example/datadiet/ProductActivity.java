@@ -39,10 +39,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
+
+
 
 public class ProductActivity extends AppCompatActivity {
 
@@ -102,36 +105,31 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     public String[] allergenCheck(String ingredients) {
+
         HashSet<String> allergensFound = new HashSet<>();
         SharedPreferences preferences = this.getSharedPreferences(
                 "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
         Boolean allergiesChecked = preferences.getBoolean("allergiesChecked", false);
-        Boolean veganChecked = preferences.getBoolean("allergiesChecked", false);
-        Boolean vegetarianChecked = preferences.getBoolean("allergiesChecked", false);
-        Boolean pescatarianChecked = preferences.getBoolean("allergiesChecked", false);
+        Boolean veganChecked = preferences.getBoolean("veganChecked", false);
+        Boolean vegetarianChecked = preferences.getBoolean("vegetarianChecked", false);
+        Boolean pescatarianChecked = preferences.getBoolean("pescatarianChecked", false);
         Log.d("allergy check", allergiesChecked.toString());
 
 
         if (allergiesChecked) {
-            HashSet<String> allergiesSet = new HashSet();
-            StringTokenizer ingredientList = new StringTokenizer(ingredients, ",.:[]() ");
-            StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",.:[]() ");
-
-            while (allergyList.hasMoreTokens()) {
-                String allergen = allergyList.nextToken().toLowerCase();
-                allergiesSet.add(allergen);
-                Log.d("allergy check", allergen);
-            }
+            StringTokenizer ingredientList = new StringTokenizer(ingredients, ",():");
 
             while (ingredientList.hasMoreTokens()) {
-                String ingredient = ingredientList.nextToken().toLowerCase();
-                if (allergiesSet.contains(ingredient)) {
-                    Log.d("allergy check", "found: " + ingredient);
-                    if (!allergensFound.contains(ingredient))
-                        allergensFound.add(ingredient);
+                StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",():");
+                String ingredient = ingredientList.nextToken().toLowerCase().trim();
+                while (allergyList.hasMoreTokens()) {
+                    String allergen = allergyList.nextToken().toLowerCase().trim();
 
+                    Log.d("allergy check", ingredient + " ->" + allergen);
+
+                    if (ingredient.contains(allergen) && !allergensFound.contains(ingredient))
+                        allergensFound.add(ingredient);
                 }
-                Log.d("allergy check", ingredient);
             }
         }
 

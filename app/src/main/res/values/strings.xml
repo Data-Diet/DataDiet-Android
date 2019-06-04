@@ -5,11 +5,13 @@
     <string name="history">History</string>
     <string name="product">Product</string>
 
-    <string name="vegan">Vegan</string>
-    <string name="vegetarian">Vegetarian</string>
-    <string name="pescatarian">Pescatarian</string>
+    <string name="vegan"> Vegan</string>
+    <string name="vegetarian"> Vegetarian</string>
+    <string name="pescatarian"> Pescatarian</string>
+    <string name="kosher"> Kosher</string>
+    <string name="otherHint">Other</string>
     <string name="allergies">Allergies</string>
-    <string name="hint">List allergies separated by commas</string>
+    <string name="allergyHint">List allergies separated by commas</string>
 
     <string name="labelTitle">Product Labels</string>
     <string name="ingredientsTitle">Ingredients</string>
