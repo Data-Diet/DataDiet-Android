@@ -22,7 +22,10 @@ import android.graphics.RectF;
 import android.util.Log;
 
 //import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
+import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
+
+import java.util.List;
 
 import jhmanalo.example.datadiet.camera.GraphicOverlay;
 
@@ -39,11 +42,13 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     private static Paint rectPaint;
     private static Paint textPaint;
     private final TextBlock text;
+    private boolean red;
 
-    OcrGraphic(GraphicOverlay overlay, TextBlock text) {
+    OcrGraphic(GraphicOverlay overlay, TextBlock text, boolean red) {
         super(overlay);
 
         this.text = text;
+        this.red = red;
 
         if (rectPaint == null) {
             rectPaint = new Paint();
@@ -55,6 +60,17 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         if (textPaint == null) {
             textPaint = new Paint();
             textPaint.setColor(TEXT_COLOR);
+            textPaint.setTextSize(54.0f);
+        }
+
+        if (this.red)
+        {
+            rectPaint = new Paint();
+            rectPaint.setColor(Color.RED);
+            rectPaint.setStyle(Paint.Style.STROKE);
+            rectPaint.setStrokeWidth(4.0f);
+            textPaint = new Paint();
+            textPaint.setColor(Color.RED);
             textPaint.setTextSize(54.0f);
         }
 
@@ -105,6 +121,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         // Draws the bounding box around the TextBlock.
         RectF rect = new RectF(text.getBoundingBox());
         rect = translateRect(rect);
+
         Log.d("OcrGraphic", "text.getValue is " + text.getValue());
         String[] arr = text.getValue().split(" ");
 
@@ -134,7 +151,14 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
 
         canvas.drawRect(rect, rectPaint);
 
+        List<? extends Text> textComponents = text.getComponents();
+        for(Text currentText : textComponents) {
+            float left = translateX(currentText.getBoundingBox().left);
+            float bottom = translateY(currentText.getBoundingBox().bottom);
+            canvas.drawText(currentText.getValue(), left, bottom, textPaint);
+        }
+
         // Render the text at the bottom of the box.
-        canvas.drawText(text.getValue(), rect.left, rect.bottom, textPaint);
+        //canvas.drawText(text.getValue(), rect.left, rect.bottom, textPaint);
     }
 }

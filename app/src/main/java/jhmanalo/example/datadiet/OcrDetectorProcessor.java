@@ -81,8 +81,8 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
             TextBlock item = items.valueAt(i);
             if (item != null && item.getValue() != null) {
                 Log.d("Processor", "Text detected! " + item.getValue());
-                OcrGraphic graphic = new OcrGraphic(graphicOverlay, item);
-                graphicOverlay.add(graphic); //LOOK AT THIS
+                OcrGraphic graphic = new OcrGraphic(graphicOverlay, item, makeRed);
+                graphicOverlay.add(graphic);
 
                 if (allergiesChecked) {
                     for (String s : allergyList) {
@@ -101,6 +101,8 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                                 Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
                                 scanned = scannedItem;
                                 makeRed = true;
+                                OcrGraphic g = new OcrGraphic(graphicOverlay, item, makeRed);
+                                graphicOverlay.add(g);
                             }
                             else
                             {
