@@ -13,14 +13,14 @@ import java.util.ArrayList;
 
 public class TextScannerResults extends AppCompatActivity {
 
-
+    ArrayList<String> result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_scanner_results);
         //TextView tv = findViewById(R.id.textView2);
         LinearLayout layout = findViewById(R.id.innerLinearLayout);
-        ArrayList<String> result = getIntent().getStringArrayListExtra("ScannedResults");
+        result = getIntent().getStringArrayListExtra("ScannedResults");
         Log.d("textScannerResult", "size of array is " + result.size());
         int i = 1;
         if (result.size() == 0)
@@ -49,11 +49,13 @@ public class TextScannerResults extends AppCompatActivity {
                 //tv.setText(s);
             }
         }
+
     }
 
 
     public void back(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        OcrDetectorProcessor.results.clear();
     }
 }
