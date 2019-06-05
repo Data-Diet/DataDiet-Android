@@ -8,12 +8,24 @@ import android.widget.EditText;
 import android.view.View;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.content.SharedPreferences;
+import android.widget.MultiAutoCompleteTextView;
+import android.widget.ArrayAdapter;
 
 public class SettingsActivity extends AppCompatActivity {
 
     CheckBox vegan, vegetarian, pescatarian, allergies, kosher, other;
-    EditText allergylist, otherDiet;
+    MultiAutoCompleteTextView allergylist;
+    EditText otherDiet;
     public static SharedPreferences sp;
+    String[] allergenSuggestions = {"acacia gum","alcohol","allura red ac","almond","anchovy","aspartame",
+            "baking powder", "baking soda","bamboo","barley","blueberry","bran","brown rice","butternut squash",
+            "caffeine","caramel","casein", "cashew","celery","cocoa","coconut","corn","crustacean","durum","egg",
+            "fish","flour","fluoride","garlic","gelatin", "gluten","glycerol ester of wood rosin","grain","guarana",
+            "hazelnut","iron","lactic acid","lemon","lime","lupin", "macadamia nut","malt","milk","mollusk",
+            "monosodium glutamate","mushroom","mustard","mycoprotein","nut","nutmeg", "oat","onion","orange",
+            "paprika","peanut","pink pepper","pistachio","pork","protein","salt","sesame","sodium benzoate",
+            "sodium citrate","soy","starch","sugar","sulfite","sulfur dioxide","sunflower","tartrazine","triticale",
+            "vanilla", "vitamin B12","wheat","whey","xanthan","yeast"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +42,10 @@ public class SettingsActivity extends AppCompatActivity {
         allergies = findViewById(R.id.allergies_checkbox);
         allergylist = findViewById(R.id.allergy_list);
 
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, allergenSuggestions);
+        allergylist.setAdapter(adapter);
+        allergylist.setThreshold(1);
+        allergylist.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
         vegan.setChecked(sp.getBoolean("veganChecked", false));
         vegetarian.setChecked(sp.getBoolean("vegetarianChecked", false));
