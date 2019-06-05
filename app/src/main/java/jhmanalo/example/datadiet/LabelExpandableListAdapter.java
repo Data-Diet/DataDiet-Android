@@ -12,14 +12,14 @@ import android.widget.TextView;
 import java.util.HashMap;
 import java.util.List;
 
-public class WarningExpandableListAdapter extends BaseExpandableListAdapter {
+public class LabelExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
 
-    public WarningExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                        HashMap<String, List<String>> expandableListDetail) {
+    public LabelExpandableListAdapter(Context context, List<String> expandableListTitle,
+                                      HashMap<String, List<String>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
         this.expandableListDetail = expandableListDetail;
@@ -47,7 +47,7 @@ public class WarningExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.expandedListItem);
-        //expandedListTextView.setTextColor(Color.RED);
+        //expandedListTextView.setTextColor(Color.parseColor("#67DB18"));
         expandedListTextView.setText(expandedListText);
         return convertView;
     }
@@ -85,7 +85,7 @@ public class WarningExpandableListAdapter extends BaseExpandableListAdapter {
         TextView listTitleTextView = (TextView) convertView
                 .findViewById(R.id.listTitle);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
-        listTitleTextView.setTextColor(Color.RED);
+        listTitleTextView.setTextColor(Color.parseColor("#67DB18"));
         listTitleTextView.setText(listTitle);
 
         return convertView;

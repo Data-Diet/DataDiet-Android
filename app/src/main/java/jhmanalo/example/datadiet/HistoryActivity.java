@@ -30,7 +30,7 @@ public class HistoryActivity extends AppCompatActivity {
     GestureDetector gestureDetector;
     ImageButton delete;
     ConstraintLayout historyLayout;
-    String productDeleted, prodDelURL, prodDelWarn;
+    String productDeleted, prodDelURL, prodDelWarn, prodDelLabel;
 
 
     @Override
@@ -123,8 +123,9 @@ public class HistoryActivity extends AppCompatActivity {
                 String productName = product.getText().toString();
                 String productURL = getProductURL(productName);
                 String productIngredients = getProductIngredients(productName);
+                String productlabels = getProductLabels(productName);
                 productDB.deleteName(productName);
-                productDB.insert(productName, productURL, productIngredients);
+                productDB.insert(productName, productURL, productIngredients, productlabels);
                 Intent intent = new Intent(HistoryActivity.this, ProductActivity.class);
                 startActivity(intent);
             } return true;
@@ -175,6 +176,19 @@ public class HistoryActivity extends AppCompatActivity {
             } return productIngredients;
         }
 
+        private String getProductLabels(String productName) {
+            String productPresent, productlabels = "";
+            Boolean found = false;
+            Cursor cursor = productDB.getAllProducts();
+            while (cursor.moveToNext() && !found) {
+                productPresent = cursor.getString(1);
+                if (productPresent.equals(productName)) {
+                    productlabels = cursor.getString(4);
+                    found = true;
+                }
+            } return productlabels;
+        }
+
         private void showDeleteButton(MotionEvent motionEvent) {
             int swipeIndex = getIndexOfGesture(motionEvent);
             listItemSwiped = listView.getChildAt(swipeIndex);
@@ -187,6 +201,7 @@ public class HistoryActivity extends AppCompatActivity {
                         productDeleted = product.getText().toString();
                         prodDelURL = getProductURL(productDeleted);
                         prodDelWarn = getProductIngredients(productDeleted);
+                        prodDelLabel = getProductLabels(productDeleted);
                         productDB.deleteName(productDeleted);
                         adapter.clear();
                         displayProductList();
@@ -194,7 +209,7 @@ public class HistoryActivity extends AppCompatActivity {
                                 .setAction("UNDO", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        productDB.insert(productDeleted, prodDelURL, prodDelWarn);
+                                        productDB.insert(productDeleted, prodDelURL, prodDelWarn, prodDelLabel);
                                         adapter.clear();
                                         displayProductList();
                                         Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);

@@ -7,4 +7,5 @@
     <color name="TransBG">#66FFFFFF</color>
     <color name="black">#000</color>
     <color name="red">#F00</color>
+    <color name="lightGreen">#67DB18</color>
 </resources>
