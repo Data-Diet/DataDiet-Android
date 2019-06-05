@@ -47,7 +47,7 @@ public class LabelExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.expandedListItem);
-        expandedListTextView.setTextColor(Color.RED);
+        //expandedListTextView.setTextColor(Color.parseColor("#67DB18"));
         expandedListTextView.setText(expandedListText);
         return convertView;
     }
@@ -85,7 +85,7 @@ public class LabelExpandableListAdapter extends BaseExpandableListAdapter {
         TextView listTitleTextView = (TextView) convertView
                 .findViewById(R.id.listTitle);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
-        listTitleTextView.setTextColor(Color.RED);
+        listTitleTextView.setTextColor(Color.parseColor("#67DB18"));
         listTitleTextView.setText(listTitle);
 
         return convertView;

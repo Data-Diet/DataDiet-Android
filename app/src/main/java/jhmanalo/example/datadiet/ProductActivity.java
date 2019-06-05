@@ -76,6 +76,10 @@ public class ProductActivity extends AppCompatActivity {
             kosherChecked      = false,
             otherChecked       = false;
 
+    String otherText;
+    String warningTextLine;
+    String labelsTextLine;
+
     ArrayList<String> ingredientsList;
     ArrayList<String> labelsList;
 
@@ -89,6 +93,11 @@ public class ProductActivity extends AppCompatActivity {
     List<String> warningListTitle;
     HashMap<String, List<String>> warningListDetail;
 
+    ExpandableListView labelListView;
+    LabelExpandableListAdapter labelListAdapter;
+    List<String> labelListTitle;
+    HashMap<String, List<String>> labelListDetail;
+
     ProgressDialog ProgressData;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +109,7 @@ public class ProductActivity extends AppCompatActivity {
 
         expandableListDetail = new HashMap<>();
         warningListDetail = new HashMap<>();
+        labelListDetail = new HashMap<>();
 
 
         cursor = ProductDb.getLatestProduct();
@@ -124,11 +134,6 @@ public class ProductActivity extends AppCompatActivity {
         SharedPreferences preferences = this.getSharedPreferences(
                 "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
         allergiesChecked = preferences.getBoolean("allergiesChecked", false);
-        veganChecked = preferences.getBoolean("veganChecked", false);
-        vegetarianChecked = preferences.getBoolean("vegetarianChecked", false);
-        pescatarianChecked = preferences.getBoolean("pescatarianChecked", false);
-        kosherChecked = preferences.getBoolean("kosherChecked", false);
-        otherChecked = preferences.getBoolean("otherChecked", false);
         Log.d("allergy check", allergiesChecked.toString());
 
 
@@ -155,10 +160,46 @@ public class ProductActivity extends AppCompatActivity {
             return new ArrayList<>(allergensFound);
     }
 
+    public ArrayList<String> labelCheck(ArrayList<String> labels) {
+
+        HashSet<String> labelsFound = new HashSet<>();
+        SharedPreferences preferences = this.getSharedPreferences(
+                "jhmanalo.example.datadiet.activity_settings", Context.MODE_PRIVATE);
+        veganChecked = preferences.getBoolean("veganChecked", false);
+        vegetarianChecked = preferences.getBoolean("vegetarianChecked", false);
+        pescatarianChecked = preferences.getBoolean("pescatarianChecked", false);
+        kosherChecked = preferences.getBoolean("kosherChecked", false);
+        otherChecked = preferences.getBoolean("otherChecked", false);
+        otherText = preferences.getString("otherDiet", "");
+
+            for  (int i = 0; i < labels.size(); i++) {
+
+                Log.d("allergy check", labels.get(i) + " -> vegan");
+
+                if (veganChecked && labels.get(i).toLowerCase().contains("vegan"))
+                    labelsFound.add("vegan");
+                if (vegetarianChecked && labels.get(i).toLowerCase().contains("vegetarian"))
+                    labelsFound.add("Vegetarian");
+                if (pescatarianChecked && labels.get(i).toLowerCase().contains("pescatarian"))
+                    labelsFound.add("Pescatarian");
+                if (kosherChecked && labels.get(i).toLowerCase().contains("kosher"))
+                    labelsFound.add("Kosher");
+                if (otherChecked && labels.get(i).toLowerCase().contains(otherText.toLowerCase()))
+                    labelsFound.add(otherText);
+            }
+
+        if (labelsFound.isEmpty())
+            return new ArrayList<>();
+        else
+            return new ArrayList<>(labelsFound);
+    }
+
+
     public void displayProduct (JSONObject obj){
 
         product = null;
 
+        // JSON Product
         try {
             product = obj.getJSONObject("product");
         } catch (Exception e) {
@@ -173,11 +214,13 @@ public class ProductActivity extends AppCompatActivity {
         TextView productTitleView = findViewById(R.id.productTitle);
         expandableListView = findViewById(R.id.productItemList);
         warningListView = findViewById(R.id.warningList);
+        labelListView = findViewById(R.id.checkedLabelList);
 
         String imageURL = null;
         String productBrand = null;
         String productTitle = null;
 
+        //brand and Title
         try {
             productBrand = product.get("brands").toString();
             productTitle = productBrand + "\n" +
@@ -190,7 +233,7 @@ public class ProductActivity extends AppCompatActivity {
             productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);
 
             ProductDb.deleteURL(ProductURL);
-            ProductDb.insert(product.get("product_name").toString(), ProductURL, "TBD");
+            ProductDb.insert(product.get("product_name").toString(), ProductURL, "", "");
 
             productTitleView.setText(productTitleText);
 
@@ -202,7 +245,7 @@ public class ProductActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        // Product Image
+        // JSON Product Image
         try {
             imageURL = product.get("image_front_url").toString();
 
@@ -216,11 +259,10 @@ public class ProductActivity extends AppCompatActivity {
             Log.e("Display Data", "error retrieving JSON image data");
         }
 
-        // Allergens
+        // JSON Allergens
         try {
             StringBuilder sbLine = new StringBuilder();
 
-            String warningTextLine = "";
             ArrayList<String> allergensFound = allergenCheck(product.getString("ingredients_text"));
 
             if (!allergensFound.isEmpty())
@@ -234,7 +276,7 @@ public class ProductActivity extends AppCompatActivity {
                 warningListDetail.put("Allergens found from your preferences:", allergensFound);
 
                 ProductDb.deleteURL(ProductURL);
-                ProductDb.insert(product.get("product_name").toString(), ProductURL, warningTextLine);
+                ProductDb.insert(product.get("product_name").toString(), ProductURL, warningTextLine, "");
             }
 
         } catch (Exception e) {
@@ -259,14 +301,36 @@ public class ProductActivity extends AppCompatActivity {
             Log.e("Display Data", "error retrieving labels JSON data");
         }
 
+        // JSON label check
+        try {
+            StringBuilder sbLine = new StringBuilder();
+
+            ArrayList<String> labelFound = labelCheck(labelsList);
+
+            if (!labelFound.isEmpty())
+            {
+                for (String label: labelFound) {
+                    sbLine.append(label);
+                    sbLine.append(", ");
+                }
+
+                labelsTextLine = sbLine.toString().substring(2);
+                labelListDetail.put("Labels found from your preferences:", labelFound);
+
+                ProductDb.deleteURL(ProductURL);
+                ProductDb.insert(product.get("product_name").toString(), ProductURL, warningTextLine, labelsTextLine);
+            }
+
+        } catch (Exception e) {
+            Log.e("allergen check", e.getLocalizedMessage());
+            Log.d("allergen check", "error parsing labels Text JSON");
+        }
+
+        // JSON Ingredients
         try {
             JSONIngrArray = product.getJSONArray("ingredients_tags");
             ingredientsLen = JSONIngrArray.length();
-        } catch (Exception e) {
-            Log.e("Display Data", "error retrieving ingredients JSON data");
-        }
 
-        try{
             ingredientsList = new ArrayList<>();
 
             makeDropdownList(JSONIngrArray, ingredientsLen, ingredientsList, "ingredients");
@@ -274,8 +338,7 @@ public class ProductActivity extends AppCompatActivity {
             if (!ingredientsList.isEmpty())
                 expandableListDetail.put("Ingredients", ingredientsList);
         } catch (Exception e) {
-            Log.e("Display Data", "error retrieving allergen check");
-
+            Log.e("Display Data", "error retrieving ingredients JSON data");
         }
 
         if (JSONIngrArray == null && JSONlabelArray == null)
@@ -298,6 +361,15 @@ public class ProductActivity extends AppCompatActivity {
 
 //        Log.d("JSON URL", ProductURL);
 //        Log.d("product ingredients", String.valueOf(ingredientsLen));
+
+        labelListTitle = new ArrayList<>(labelListDetail.keySet());
+
+        if (labelListDetail != null && labelListTitle != null)
+            labelListAdapter = new LabelExpandableListAdapter(this, labelListTitle, labelListDetail);
+
+        if (labelListAdapter != null)
+            labelListView.setAdapter(labelListAdapter);
+
         warningListTitle = new ArrayList<>(warningListDetail.keySet());
 
         if (warningListDetail != null && warningListTitle != null)
@@ -480,7 +552,6 @@ public class ProductActivity extends AppCompatActivity {
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
             }
-
         }
     }
 }

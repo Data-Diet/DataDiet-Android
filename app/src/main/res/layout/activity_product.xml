@@ -73,19 +73,12 @@
                 android:textStyle="bold"
                 android:textAlignment="center"/>
 
-            <SearchView
-                android:id="@+id/ingredientSearch"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/search_btn"/>
-
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="5000dp">
 
                 <ExpandableListView
-                    android:id="@+id/warningList"
+                    android:id="@+id/checkedLabelList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
@@ -94,13 +87,30 @@
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <ExpandableListView
+                    android:id="@+id/warningList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="0.5dp"
+                    android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+                    app:layout_constraintTop_toBottomOf="@id/checkedLabelList"/>
+
+                <SearchView
+                    android:id="@+id/ingredientSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/search_btn"
+                    app:layout_constraintTop_toBottomOf="@id/warningList"/>
+
+                <ExpandableListView
                     android:id="@+id/productItemList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
                     android:dividerHeight="0.5dp"
                     android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
-                    app:layout_constraintTop_toBottomOf="@id/warningList"/>
+                    app:layout_constraintTop_toBottomOf="@id/ingredientSearch"/>
             </android.support.constraint.ConstraintLayout>
 
         </LinearLayout>

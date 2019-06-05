@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 {
                     String ProductURL = "https://world.openfoodfacts.org/api/v0/product/" + item.getRawValue() + ".json";
                     ProductDb.deleteURL(ProductURL);
-                    ProductDb.insert("", ProductURL, "");
+                    ProductDb.insert("", ProductURL, "", "");
                     Intent intent = new Intent(context, ProductActivity.class);
                     startActivity(intent);
                 }

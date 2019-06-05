@@ -26,7 +26,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //CREATE TABLE NAME_TABLE (_id INTEGER PRIMARY KEY, FIRST_NAME STRING, LAST_NAME STRING);
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, PRODUCT_URL STRING, WARNINGS STRING);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id INTEGER PRIMARY KEY, PRODUCT_NAME STRING, PRODUCT_URL STRING, WARNINGS STRING, LABELS STRING);");
         //Toast.makeText(ctx, "TABLE IS CREATED", Toast.LENGTH_LONG).show();
     }
 
@@ -42,12 +42,13 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insert(String name, String url, String warnings){
+    public void insert(String name, String url, String warnings, String labels){
         db = getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("PRODUCT_NAME", name);
         cv.put("PRODUCT_URL", url);
         cv.put("WARNINGS", warnings);
+        cv.put("LABELS", labels);
 
         db.insert(TABLE_NAME, null, cv);
     }

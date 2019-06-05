@@ -47,7 +47,7 @@ public class WarningExpandableListAdapter extends BaseExpandableListAdapter {
         }
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.expandedListItem);
-        expandedListTextView.setTextColor(Color.RED);
+        //expandedListTextView.setTextColor(Color.RED);
         expandedListTextView.setText(expandedListText);
         return convertView;
     }
