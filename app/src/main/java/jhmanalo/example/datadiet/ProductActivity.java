@@ -177,7 +177,7 @@ public class ProductActivity extends AppCompatActivity {
                 Log.d("allergy check", labels.get(i) + " -> vegan");
 
                 if (veganChecked && labels.get(i).toLowerCase().contains("vegan"))
-                    labelsFound.add("vegan");
+                    labelsFound.add("Vegan");
                 if (vegetarianChecked && labels.get(i).toLowerCase().contains("vegetarian"))
                     labelsFound.add("Vegetarian");
                 if (pescatarianChecked && labels.get(i).toLowerCase().contains("pescatarian"))
