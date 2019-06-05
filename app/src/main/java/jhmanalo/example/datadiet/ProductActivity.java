@@ -148,7 +148,7 @@ public class ProductActivity extends AppCompatActivity {
 
                     Log.d("allergy check", ingredient + " ->" + allergen);
 
-                    if (ingredient.contains(allergen) && !allergensFound.contains(ingredient))
+                    if (ingredient.contains(allergen) && !allergensFound.contains(ingredient) && !allergen.equals(" ") && !allergen.equals(""))
                         allergensFound.add(ingredient);
                 }
             }
