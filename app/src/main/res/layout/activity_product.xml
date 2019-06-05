@@ -40,8 +40,6 @@
         android:id="@+id/itemScrollLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/TransBG"
-        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -53,7 +51,7 @@
             android:id="@+id/itemLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@drawable/product_contain"
             android:orientation="vertical"
             android:padding="5dp">
 
@@ -61,34 +59,39 @@
                 android:id="@+id/productPic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true" />
+                android:layout_marginTop="8dp"
+                android:contentDescription="@string/product"/>
 
             <TextView
                 android:id="@+id/productTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif"
                 android:textColor="@android:color/black"
-                android:textSize="30dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/warningTag"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="14dp"
-                android:textStyle="bold" />
-
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textAlignment="center"/>
 
             <SearchView
                 android:id="@+id/ingredientSearch"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/search_btn"/>
 
-            <RelativeLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="10000dp">
+                android:layout_height="5000dp">
+
+                <ExpandableListView
+                    android:id="@+id/warningList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="0.5dp"
+                    android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ExpandableListView
                     android:id="@+id/productItemList"
@@ -96,8 +99,9 @@
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
                     android:dividerHeight="0.5dp"
-                    android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
-            </RelativeLayout>
+                    android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+                    app:layout_constraintTop_toBottomOf="@id/warningList"/>
+            </android.support.constraint.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>
