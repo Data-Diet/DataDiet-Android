@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.util.Log;
 
 //import com.google.android.gms.samples.vision.ocrreader.ui.camera.GraphicOverlay;
@@ -127,7 +128,9 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
 
         if (OcrDetectorProcessor.makeRed)
         {
-            for (String s : arr)
+            rectPaint.setColor(Color.RED);
+            textPaint.setColor(Color.RED);
+            /*for (String s : arr)
             {
                 String cleanS = s.trim();
                 cleanS = cleanS.toLowerCase();
@@ -145,7 +148,18 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
                     rectPaint.setColor(Color.WHITE);
                     textPaint.setColor(Color.WHITE);
                 }
-            }
+            }*/
+        }
+        else
+        {
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    // yourMethod();
+                    rectPaint.setColor(Color.WHITE);
+                    textPaint.setColor(Color.WHITE);
+                }
+            }, 8000);
 
         }
 

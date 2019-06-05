@@ -31,10 +31,13 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -57,6 +60,8 @@ import java.util.Locale;
 import jhmanalo.example.datadiet.camera.CameraSource;
 import jhmanalo.example.datadiet.camera.CameraSourcePreview;
 import jhmanalo.example.datadiet.camera.GraphicOverlay;
+
+import static android.support.constraint.ConstraintSet.BOTTOM;
 
 /**
  * Activity for the Ocr Detecting app.  This app detects text and displays the value with the
@@ -136,9 +141,9 @@ public final class OcrCaptureActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new CaptureGestureListener());
         scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
 
-        Snackbar.make(graphicOverlay, "Hold text to camera to scan",
+        /*Snackbar.make(graphicOverlay, "Hold text to camera to scan",
                 Snackbar.LENGTH_LONG)
-                .show();
+                .show();*/
 
 
         // TODO: Set up the Text To Speech engine.
@@ -180,7 +185,36 @@ public final class OcrCaptureActivity extends AppCompatActivity {
                                         // put code on click operation
                                     }
                                 });
+
+        Button viewbtn = new Button(this);
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics ();
+        display.getMetrics(outMetrics);
+
+        float density  = getResources().getDisplayMetrics().density;
+        float dpHeight = outMetrics.heightPixels / density;
+        float dpWidth  = outMetrics.widthPixels / density;
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        ConstraintSet set = new ConstraintSet();
+
+        set.connect(viewbtn.getId(), BOTTOM, R.id.ConstraintLayout, BOTTOM, 8);
+        set.applyTo(layout);
+        viewbtn.setText("View Results");
+
+        viewbtn.setOnClickListener(new Button.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                Intent intent;
+                intent = new Intent(v.getContext(), TextScannerResults.class);
+                intent.putExtra("ScannedResults", OcrDetectorProcessor.results);
+                startActivity(intent);
+                // put code on click operation
+            }
+        });
+
         layout.addView(back);
+        layout.addView(viewbtn);
         //imageView.setEnabled(false);
     }
 

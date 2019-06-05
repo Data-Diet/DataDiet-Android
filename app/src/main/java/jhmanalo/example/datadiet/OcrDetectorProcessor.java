@@ -30,6 +30,8 @@ import com.google.android.gms.vision.text.TextBlock;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 import jhmanalo.example.datadiet.camera.GraphicOverlay;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -50,6 +52,8 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
     String[] allergyList;
     public static boolean makeRed;
     public static String scanned;
+    String[] tokens;
+    public static ArrayList<String> results = new ArrayList<>();
     //public SharedPreferences sp = getSharedPreferences("jhmanalo.example.datadiet.activity_settings", MODE_PRIVATE);
 
     /*@Override
@@ -75,8 +79,10 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
         allergiesChecked = OcrCaptureActivity.allergiesChecked;
         allergyList = OcrCaptureActivity.allergyList;
 
+
         graphicOverlay.clear();
         SparseArray<TextBlock> items = detections.getDetectedItems();
+
         for (int i = 0; i < items.size(); ++i) {
             TextBlock item = items.valueAt(i);
             if (item != null && item.getValue() != null) {
@@ -87,28 +93,48 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                 if (allergiesChecked) {
                     for (String s : allergyList) {
 
-                        String[] tokens = item.getValue().split(" ");
-                        for (String t : tokens) {
-                            String fromSharedPref = s.toLowerCase();
-                            fromSharedPref = fromSharedPref.trim();
-
-                            String scannedItem = t.toLowerCase();
-                            scannedItem = scannedItem.replace("\n", " ");
-                            scannedItem = scannedItem.trim();
-                            Log.d("processor", "value of s: " + fromSharedPref);
-                            Log.d("processor", "value of t: " + scannedItem);
-                            if (fromSharedPref.equals(scannedItem)) {
-                                Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
-                                scanned = scannedItem;
-                                makeRed = true;
-                                OcrGraphic g = new OcrGraphic(graphicOverlay, item, makeRed);
-                                graphicOverlay.add(g);
-                            }
-                            else
-                            {
-                                //makeRed = false;
-                            }
+                        if (item.getValue().contains(","))
+                        {
+                            tokens = item.getValue().split(",");
                         }
+                        else
+                        {
+                            tokens = item.getValue().split(" ");
+                        }
+
+                        //String[] tokens = item.getValue().split(" ");
+                        //if (item.getValue().contains("Ingredients:") || item.getValue().contains("INGREDIENTS:") || item.getValue().contains("ingredients:")) {
+                            Log.d("processor", "lolll");
+                            for (String t : tokens) {
+                                String fromSharedPref = s.toLowerCase();
+                                fromSharedPref = fromSharedPref.trim();
+
+                                String scannedItem = t.toLowerCase();
+                                scannedItem = scannedItem.replace("\n", " ");
+                                scannedItem = scannedItem.trim();
+                                if (scannedItem.equals("ingredients:")) {
+                                    continue;
+                                }
+                                Log.d("processor", "value of fromSharedPref: " + fromSharedPref);
+                                Log.d("processor", "value of scannedItem: " + scannedItem);
+                                if (fromSharedPref.equals(scannedItem)) {
+                                    Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
+                                    if (results.contains(scannedItem) == false)
+                                    {
+                                        Log.d("processor", "added " + scannedItem);
+                                        results.add(scannedItem);
+                                    }
+
+                                    scanned = scannedItem;
+                                    makeRed = true;
+                                    OcrGraphic g = new OcrGraphic(graphicOverlay, item, makeRed);
+                                    graphicOverlay.add(g);
+
+                                } else {
+                                    makeRed = false;
+                                }
+                            }
+                        //}
                     }
                 }
             }
