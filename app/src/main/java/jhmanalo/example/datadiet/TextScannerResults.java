@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static jhmanalo.example.datadiet.OcrDetectorProcessor.results;
+
 public class TextScannerResults extends AppCompatActivity {
 
     ArrayList<String> result;
@@ -27,25 +29,20 @@ public class TextScannerResults extends AppCompatActivity {
         {
             TextView tv = new TextView(this);
             tv.setText("May not have found allergens from you preferences.");
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.leftMargin = 32;
-            params.topMargin = i * 32;
-            params.weight = 0;
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100);
+            tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tv.setLayoutParams(params);
             layout.addView(tv);
         }
         else {
-            for (String s : result) {
+            for (String s : results) {
                 Log.d("textScannerResult", s);
                 TextView tv = new TextView(this);
                 tv.setText(s);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.leftMargin = 32;
-                params.topMargin = i * 32;
-                params.weight = 0;
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100);
+                tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 tv.setLayoutParams(params);
                 layout.addView(tv);
-                i++;
                 //tv.setText(s);
             }
         }
@@ -56,6 +53,6 @@ public class TextScannerResults extends AppCompatActivity {
     public void back(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        OcrDetectorProcessor.results.clear();
+        results.clear();
     }
 }

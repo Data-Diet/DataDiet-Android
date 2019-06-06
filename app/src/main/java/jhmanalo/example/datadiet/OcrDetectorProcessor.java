@@ -31,6 +31,7 @@ import com.google.android.gms.vision.text.TextBlock;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import jhmanalo.example.datadiet.camera.GraphicOverlay;
 
@@ -117,9 +118,9 @@ public class OcrDetectorProcessor extends AppCompatActivity implements Detector.
                                 }
                                 Log.d("processor", "value of fromSharedPref: " + fromSharedPref);
                                 Log.d("processor", "value of scannedItem: " + scannedItem);
-                                if (fromSharedPref.equals(scannedItem)) {
+                                if (scannedItem.contains(fromSharedPref) && !fromSharedPref.equals("") && !scannedItem.contains("ingredient")) {
                                     Log.d("processor", "Warning! Allergen: " + scannedItem + " detected!");
-                                    if (results.contains(scannedItem) == false)
+                                    if (!results.contains(scannedItem))
                                     {
                                         Log.d("processor", "added " + scannedItem);
                                         results.add(scannedItem);
