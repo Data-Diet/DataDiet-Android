@@ -26,7 +26,6 @@
                 android:layout_height="wrap_content"
                 android:onClick="resetScroll"
                 android:text="@string/result"
-                android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="30sp"
                 android:textStyle="bold"

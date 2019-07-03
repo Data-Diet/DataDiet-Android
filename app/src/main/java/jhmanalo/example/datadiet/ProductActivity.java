@@ -138,10 +138,10 @@ public class ProductActivity extends AppCompatActivity {
 
 
         if (allergiesChecked) {
-            StringTokenizer ingredientList = new StringTokenizer(ingredients, ",():");
+            StringTokenizer ingredientList = new StringTokenizer(ingredients, ",():.");
 
             while (ingredientList.hasMoreTokens()) {
-                StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",():");
+                StringTokenizer allergyList = new StringTokenizer(preferences.getString("allergylist", "not found"), ",():.");
                 String ingredient = ingredientList.nextToken().toLowerCase().trim();
                 while (allergyList.hasMoreTokens()) {
                     String allergen = allergyList.nextToken().toLowerCase().trim();
@@ -225,9 +225,6 @@ public class ProductActivity extends AppCompatActivity {
             productBrand = product.get("brands").toString();
             productTitle = productBrand + "\n" +
                     product.get("product_name").toString();
-
-            final StyleSpan bss = new StyleSpan(Typeface.BOLD); // Span to make text bold
-            final StyleSpan iss = new StyleSpan(Typeface.ITALIC); //Span to make text italic
 
             SpannableString productTitleText = new SpannableString(productTitle);
             productTitleText.setSpan(new UnderlineSpan(), 0, productBrand.length(), 0);

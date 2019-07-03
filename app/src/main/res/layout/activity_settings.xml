@@ -39,7 +39,7 @@
             android:id="@+id/vegan_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/vegan"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -50,7 +50,7 @@
             android:id="@+id/vegetarian_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/vegetarian"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -61,7 +61,6 @@
             android:id="@+id/pescatarian_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
             android:text="@string/pescatarian"
             android:textColor="@color/white"
             android:textSize="20sp"
@@ -72,10 +71,12 @@
             android:id="@+id/kosher_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/kosher"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
+            android:visibility="gone"
             android:layout_marginStart="10dp"/>
 
         <LinearLayout
@@ -95,8 +96,7 @@
             <EditText
                 android:id="@+id/other_diet"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_height="50dp"
                 android:ems="10"
                 android:hint="@string/otherHint"
                 android:inputType="textPersonName"
