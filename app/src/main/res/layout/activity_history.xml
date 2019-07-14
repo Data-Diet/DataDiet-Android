@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HistoryActivity"
-    android:background="@drawable/food_background"
+    android:background="@drawable/vegetable_background"
     android:id="@+id/historyLayout">
 
     <TextView
-        android:id="@+id/history_header"
+        android:id="@+id/historyHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -20,21 +20,19 @@
         android:textSize="25sp"
         android:textStyle="bold"
         android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/list_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="80dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="100dp"
-        android:divider="@color/white"
-        android:dividerHeight="1dp">
-    </ListView>
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@id/historyHeader"
+        android:paddingTop="10dp"/>
 
     <Button
         android:layout_width="30dp"

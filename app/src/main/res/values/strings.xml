@@ -17,7 +17,7 @@
     <string name="labelTitle">Product Labels</string>
     <string name="ingredientsTitle">Ingredients</string>
     <string name="popUpTitle">Are you sure you want to clear history?</string>
-    <string name="pupUpMessage">You will not be able to get this information back.</string>
+    <string name="popUpMessage">You will not be able to get this information back.</string>
     <string name="clear">Clear</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
