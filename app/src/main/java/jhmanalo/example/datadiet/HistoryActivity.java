@@ -2,82 +2,138 @@ package jhmanalo.example.datadiet;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.database.Cursor;
-import android.widget.Toast;
-import android.widget.ImageButton;
-import android.support.v7.app.AlertDialog;
-import android.content.DialogInterface;
-import android.widget.ListView;
+import java.util.List;
 import java.util.ArrayList;
-import android.widget.ArrayAdapter;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.util.Log;
-import android.widget.TextView;
-import android.content.Intent;
+import android.database.Cursor;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.graphics.Canvas;
+import android.support.v7.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class HistoryActivity extends AppCompatActivity {
 
-    ListView listView;
-    ProductDbHelper productDB;
-    Cursor cursor;
-    ArrayList<String> listItems;
-    ArrayAdapter adapter;
-    View listItemSwiped;
-    GestureDetector gestureDetector;
-    ImageButton delete;
-    ConstraintLayout historyLayout;
-    String productDeleted, prodDelURL, prodDelWarn, prodDelLabel;
-
+    private ProductDataAdapter pAdapter;
+    private ProductDbHelper productDb;
+    SwipeController swipeController = null;
+    private RecyclerView recyclerView;
+    private ItemClickListener itemClickListener;
+    private boolean updateAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        historyLayout = findViewById(R.id.historyLayout);
-        listView = findViewById(R.id.list_view);
-        productDB = new ProductDbHelper(this);
-        cursor = productDB.getAllProducts();
-        listItems = new ArrayList<>();
-        displayProductList();
-        View productListView = findViewById(R.id.list_view);
-        gestureDetector = new GestureDetector(this, new GestureListener());
-        productListView.setOnTouchListener(touchListener);
+        productDb = new ProductDbHelper(this);
+        setProductDataAdapter();
+        setRecyclerView();
+        updateAdapter = false;
+        itemClickListener = new ItemClickListener() {
+            @Override
+            public void onItemClicked(int position) {
+                openProductDetails(position);
+            }
+        };
     }
 
-    public void displayProductList() {
-        if (productDB.getAllProducts().getCount() != 0) {
-            cursor = productDB.getLatestProduct();
-            Log.d("HistoryActivity", "displayProduct " + cursor.getString(1));
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (updateAdapter) {
+            Cursor cursor = productDb.getLatestProduct();
+            Product lastProdViewed = new Product();
+            lastProdViewed.setName(cursor.getString(cursor.getColumnIndex("PRODUCT_NAME")));
+            lastProdViewed.setUrl(cursor.getString(cursor.getColumnIndex("PRODUCT_URL")));
+            lastProdViewed.setWarnings(cursor.getString(cursor.getColumnIndex("WARNINGS")));
+            lastProdViewed.setLabels(cursor.getString(cursor.getColumnIndex("LABELS")));
+            pAdapter.products.add(0, lastProdViewed);
+            pAdapter.notifyDataSetChanged();
+            updateAdapter = false;
+        }
+    }
+
+    private void setProductDataAdapter() {
+        List<Product> products = new ArrayList<>();
+        Cursor cursor = productDb.getLatestProduct();
+        if ((productDb.getAllProducts()).getCount() > 0) {
             do {
-                listItems.add(cursor.getString(1));
+                Product product = new Product();
+                product.setName(cursor.getString(cursor.getColumnIndex("PRODUCT_NAME")));
+                product.setUrl(cursor.getString(cursor.getColumnIndex("PRODUCT_URL")));
+                product.setWarnings(cursor.getString(cursor.getColumnIndex("WARNINGS")));
+                product.setLabels(cursor.getString(cursor.getColumnIndex("LABELS")));
+                products.add(product);
             } while (cursor.moveToPrevious());
-            adapter = new ArrayAdapter<>(this, R.layout.list_view_product, R.id.productName, listItems);
-            listView.setAdapter(adapter);
-        } else
-            Toast.makeText(this, "No history to display", Toast.LENGTH_LONG).show();
+        }
+        pAdapter = new ProductDataAdapter(products);
+    }
+
+    private void setRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerView);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.setAdapter(pAdapter);
+
+        swipeController = new SwipeController(new SwipeControllerActions() {
+            @Override
+            public void onDeleteClicked(int position) {
+                final Product delProd = pAdapter.products.get(position);
+                final int delIndex = pAdapter.products.indexOf(delProd);
+                pAdapter.products.remove(position);
+                pAdapter.notifyItemRemoved(position);
+                pAdapter.notifyItemRangeChanged(position, pAdapter.getItemCount());
+                final ConstraintLayout historyLayout = findViewById(R.id.historyLayout);
+                final int delPos = position;
+                Snackbar snackbar = Snackbar.make(historyLayout, "Product deleted", Snackbar.LENGTH_LONG)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                pAdapter.products.add(delIndex, delProd);
+                                pAdapter.notifyItemInserted(delPos);
+                                pAdapter.notifyItemRangeChanged(delPos, pAdapter.getItemCount());
+                                Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);
+                                undoSnackbar.show();
+                            }
+                        });
+                snackbar.show();
+                if (!pAdapter.products.contains(delProd))
+                    productDb.deleteName(delProd.getName());
+            }
+        });
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeController);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c);
+            }
+        });
     }
 
     public void showPopUp(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.popUpTitle);
-        builder.setMessage(R.string.pupUpMessage);
+        builder.setMessage(R.string.popUpMessage);
         builder.setPositiveButton(R.string.clear, new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 clearHistory();
             }
-
         });
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialog, int which) {}
-
         });
         builder.setIcon(R.drawable.ic_warning_yellow_24dp);
         AlertDialog dialog = builder.create();
@@ -85,141 +141,75 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     public void clearHistory() {
-        productDB.erase();
-        adapter.clear();
-        displayProductList();
+        productDb.erase();
+        pAdapter.products.clear();
+        pAdapter.notifyDataSetChanged();
     }
 
-    public void closeHistory(View view) {
-        finish();
+    public void closeHistory(View view) { finish(); }
+
+    public void onProductTapped(int position) {
+        itemClickListener.onItemClicked(position);
     }
 
-    View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            return gestureDetector.onTouchEvent(event);
-        }
-    };
+    public void openProductDetails(int position) {
+        Product viewProd = pAdapter.products.get(position);
+        productDb.deleteName(viewProd.getName());
+        productDb.insert(viewProd.getName(), viewProd.getUrl(), "", "");
+        pAdapter.products.remove(viewProd);
+        updateAdapter = true;
+        Intent intent = new Intent(HistoryActivity.this, ProductActivity.class);
+        startActivity(intent);
+    }
 
-    public class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private static final int minSwipeDistance = 10;
-        private static final int minSwipeVelocity = 10;
+    public interface ItemClickListener {
+        void onItemClicked(int position);
+    }
 
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d("HistoryActivity", "OnDown");
-            if (delete != null && delete.getVisibility() == View.VISIBLE)
-                delete.setVisibility(View.INVISIBLE);
-            return true;
-        }
+    public class ProductDataAdapter extends RecyclerView.Adapter<ProductDataAdapter.ProductViewHolder> {
+        public List<Product> products;
 
-        @Override
-        public boolean onSingleTapUp(MotionEvent motionEvent) {
-            Log.d("HistoryActivity", "OnSingleTap");
-            int tapIndex = getIndexOfGesture(motionEvent);
-            View listItemTapped = listView.getChildAt(tapIndex);
-            if (listItemTapped != null) {
-                TextView product = listItemTapped.findViewById(R.id.productName);
-                String productName = product.getText().toString();
-                String productURL = getProductURL(productName);
-                String productIngredients = getProductIngredients(productName);
-                String productlabels = getProductLabels(productName);
-                productDB.deleteName(productName);
-                productDB.insert(productName, productURL, productIngredients, productlabels);
-                Intent intent = new Intent(HistoryActivity.this, ProductActivity.class);
-                startActivity(intent);
-            } return true;
+
+        public ProductDataAdapter(List<Product> players) {
+            this.products = players;
         }
 
-        @Override
-        public boolean onFling(MotionEvent mEvent1, MotionEvent mEvent2, float velocityX, float velocityY) {
-            Log.d("HistoryActivity", "OnFling");
-            float diffX = mEvent1.getX() - mEvent2.getX();
-            float diffY = mEvent1.getY() - mEvent2.getY();
-            if (diffX > diffY) {
-                Log.d("HistoryActivity", "OnFling Success");
-                showDeleteButton(mEvent1);
-            }
-            return true;
-        }
+        public class ProductViewHolder extends RecyclerView.ViewHolder {
+            private TextView name, warnings, labels;
 
-        private int getIndexOfGesture(MotionEvent motionEvent) {
-            int adapterIndex = listView.pointToPosition((int) motionEvent.getX(), (int) motionEvent.getY());
-            int firstViewItemIndex = listView.getFirstVisiblePosition();
-            int viewIndex = adapterIndex - firstViewItemIndex;
-            return viewIndex;
-        }
+            public ProductViewHolder(View view) {
+                super(view);
+                name = view.findViewById(R.id.name);
+                warnings = view.findViewById(R.id.warnings);
+                labels = view.findViewById(R.id.labels);
 
-        private String getProductURL(String productName) {
-            String productPresent, productURL = "";
-            Boolean found = false;
-            Cursor cursor = productDB.getAllProducts();
-            while (cursor.moveToNext() && !found) {
-                productPresent = cursor.getString(1);
-                if (productPresent.equals(productName)) {
-                    productURL = cursor.getString(2);
-                    found = true;
-                }
-            } return productURL;
-        }
-
-        private String getProductIngredients(String productName) {
-            String productPresent, productIngredients = "";
-            Boolean found = false;
-            Cursor cursor = productDB.getAllProducts();
-            while (cursor.moveToNext() && !found) {
-                productPresent = cursor.getString(1);
-                if (productPresent.equals(productName)) {
-                    productIngredients = cursor.getString(3);
-                    found = true;
-                }
-            } return productIngredients;
-        }
-
-        private String getProductLabels(String productName) {
-            String productPresent, productlabels = "";
-            Boolean found = false;
-            Cursor cursor = productDB.getAllProducts();
-            while (cursor.moveToNext() && !found) {
-                productPresent = cursor.getString(1);
-                if (productPresent.equals(productName)) {
-                    productlabels = cursor.getString(4);
-                    found = true;
-                }
-            } return productlabels;
-        }
-
-        private void showDeleteButton(MotionEvent motionEvent) {
-            int swipeIndex = getIndexOfGesture(motionEvent);
-            listItemSwiped = listView.getChildAt(swipeIndex);
-            if (listItemSwiped != null) {
-                delete = listItemSwiped.findViewById(R.id.deleteButton);
-                delete.setVisibility(View.VISIBLE);
-                delete.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View view) {
-                        TextView product = listItemSwiped.findViewById(R.id.productName);
-                        productDeleted = product.getText().toString();
-                        prodDelURL = getProductURL(productDeleted);
-                        prodDelWarn = getProductIngredients(productDeleted);
-                        prodDelLabel = getProductLabels(productDeleted);
-                        productDB.deleteName(productDeleted);
-                        adapter.clear();
-                        displayProductList();
-                        Snackbar snackbar = Snackbar.make(historyLayout, "Product deleted", Snackbar.LENGTH_LONG)
-                                .setAction("UNDO", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        productDB.insert(productDeleted, prodDelURL, prodDelWarn, prodDelLabel);
-                                        adapter.clear();
-                                        displayProductList();
-                                        Snackbar undoSnackbar = Snackbar.make(historyLayout, "Product restored", Snackbar.LENGTH_SHORT);
-                                        undoSnackbar.show();
-                                    }
-                                });
-                        snackbar.show();
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onProductTapped(getAdapterPosition());
                     }
                 });
             }
         }
+
+        @Override
+        public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_list_item, parent, false);
+            return new ProductViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(ProductViewHolder holder, int position) {
+            Product player = products.get(position);
+            holder.name.setText(player.getName());
+            holder.warnings.setText(player.getWarnings());
+            holder.labels.setText(player.getLabels());
+        }
+
+        @Override
+        public int getItemCount() {
+            return products.size();
+        }
     }
 }
+

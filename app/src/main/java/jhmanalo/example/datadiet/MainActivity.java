@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     ProductDb.insert("", ProductURL, "", "");
                     Intent intent = new Intent(context, ProductActivity.class);
                     startActivity(intent);
+                    Log.d("ActivityMain:", "Successfully added product to database");
                 }
                 break;
 
