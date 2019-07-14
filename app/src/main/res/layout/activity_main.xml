@@ -46,6 +46,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
+            android:id="@+id/btnlogin"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/btndetect"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:alpha=".8"
+            android:background="@drawable/ic_account_box_black_24dp"
+            android:onClick="openLogin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.021"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
             android:id="@+id/btnimagegallery"
             android:layout_width="40dp"
             android:layout_height="40dp"

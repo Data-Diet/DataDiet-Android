@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/toolbar_background">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar3"
+        android:id="@+id/logintoolbar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/toolbar_background"
@@ -23,12 +23,97 @@
         android:layout_height="44dp"
         android:layout_marginEnd="8dp"
         android:text="@string/Login"
+        android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="@+id/toolbar3"
-        app:layout_constraintEnd_toEndOf="@+id/toolbar3"
-        app:layout_constraintStart_toStartOf="@+id/toolbar3"
-        app:layout_constraintTop_toTopOf="@+id/toolbar3" />
+        app:layout_constraintBottom_toBottomOf="@+id/logintoolbar"
+        app:layout_constraintEnd_toEndOf="@+id/logintoolbar"
+        app:layout_constraintStart_toStartOf="@+id/logintoolbar"
+        app:layout_constraintTop_toTopOf="@+id/logintoolbar" />
+
+    <ImageView
+        android:id="@+id/scannericon"
+        android:layout_width="185dp"
+        android:layout_height="179dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logintoolbar"
+        app:srcCompat="@drawable/ic_crop_free_white_24dp" />
+
+    <ImageView
+        android:id="@+id/peanuticon"
+        android:layout_width="96dp"
+        android:layout_height="94dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scannericon"
+        app:layout_constraintEnd_toEndOf="@+id/scannericon"
+        app:layout_constraintStart_toStartOf="@+id/scannericon"
+        app:layout_constraintTop_toTopOf="@+id/scannericon"
+        app:srcCompat="@drawable/peanut_logo" />
+
+    <EditText
+        android:id="@+id/emailinput"
+        android:layout_width="213dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="108dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/search_btn"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scannericon" />
+
+    <EditText
+        android:id="@+id/passinput"
+        android:layout_width="213dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/search_btn"
+        android:ems="10"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailinput" />
+
+    <TextView
+        android:id="@+id/emaillabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Email"
+        app:layout_constraintBottom_toTopOf="@+id/emailinput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="password"
+        app:layout_constraintBottom_toTopOf="@+id/passinput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/forgotpassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Forgot Password?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/passinput" />
 </android.support.constraint.ConstraintLayout>

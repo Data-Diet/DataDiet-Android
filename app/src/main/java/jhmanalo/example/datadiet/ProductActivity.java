@@ -265,8 +265,8 @@ public class ProductActivity extends AppCompatActivity {
 
             if (!allergensFound.isEmpty()) {
                 for (String allergen : allergensFound) {
-                    sbLine.append(allergen);
                     sbLine.append(", ");
+                    sbLine.append(allergen);
                 }
 
                 warningTextLine = sbLine.toString().substring(2);
@@ -306,8 +306,8 @@ public class ProductActivity extends AppCompatActivity {
 
             if (!labelFound.isEmpty()) {
                 for (String label : labelFound) {
-                    sbLine.append(label);
                     sbLine.append(", ");
+                    sbLine.append(label);
                 }
 
                 labelsTextLine = sbLine.toString().substring(2);
