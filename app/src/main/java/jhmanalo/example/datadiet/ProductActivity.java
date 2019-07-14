@@ -120,8 +120,7 @@ public class ProductActivity extends AppCompatActivity {
     }
 
     public void closeProduct(View view) {
-        Intent intent = new Intent(context, MainActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     public void resetScroll(View view) {
